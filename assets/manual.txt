@@ -1,0 +1,114 @@
+
+                                 Engine Manual
+                                    for the
+
+          ===========================================================
+           P L A N E T - X 3   O P E N   S O U R C E   E D I T I O N
+          ===========================================================
+
+Command Line Options
+====================
+
+/v?     Video device.  The argument is a single letter.  The meaning is the
+        same as in interactive mode.
+
+/a?     Audio device.  The argument is a single letter.  The meaning is the
+        same as in interactive mode.
+
+/p????  Port override for audio device.  The argument consists of up to four
+        hexadecimal digits.  A value of 0 restores the default behavior.
+
+/m      Start with music disabled.
+
+/n      Start with sound effects disabled.
+
+/i      Start with inverted colors (2-color CGA) or the two middle colors
+        swapped (4-color CGA).  For the ATI Graphics Solution's 640x200x16
+        mode, /i requests MDA compatible timings.
+
+/r?     Rotate the NTSC composite CGA palette 0, 1, 2 or 3 times on startup.
+
+/g      Switch 16-color modes to grayscale.  Argument: Either none or your
+        monitor's gray ramp described by the 16 CGA color indices (hexadeci-
+        mal) sorted by ascending brightness.  If no argument is specified, a
+        (possibly sub-optimal) default gray ramp is used.  In CGA modes, /g
+        disables the NTSC color signal and adjusts the palette, if possible.
+
+/s      Tentatively reserved for story mode.
+
+/o?     Override tile set: Use artwork with 2 or 4 bits per pixel for modes
+        that would otherwise use 8.  Also tells the engine to use TDY instead
+        of CMP artwork (/o4) and/or CGA instead of CG2 artwork (/o2).
+        If both are specified, modes based on the 8 bit artwork will follow
+        the rightmost occurrence of /o.
+
+/f      Override sanity checks.  The program will blindly try to initialize
+        the hardware specified with /v and /a.
+
+/c?     Set the one freely selectable color (i.e. background or foreground)
+        in CGA mode to the color specified by a single hexadecimal digit.
+        If the argument is omitted, the default behavior is restored,
+        overriding any previous use of /c.
+
+
+You can write your favorite configuration to a batch file by using echo:
+
+    echo "px3_ose /va /ab /i" > px3.bat
+
+
+File Handling
+=============
+
+Planet X3 OSE will look for game assets in the current working directory,
+followed by drive A, followed by drive B.  As a last resort, it will ask for
+a disk containing the respective file.
+Savegames are always read from and written to the current working directory.
+
+Keyboard Commands
+=================
+
+Planet X3 OSE supports the following not self-documenting keyboard commands:
+
+cursor keys     move unit or cursor
+Enter           select unit, building or menu entry
+Space           fire
+TAB, +, =       cycle through units
+-               cycle through units (backwards)
+PgDn, ]         cycle through buildings
+PgUp, [         cycle through buildings (backwards)
+Shift + 0-9     save hotkey for active unit or building *
+0-9             select unit or building via hotkey *
+
+* In the intro menu, these keys control the jukebox, instead.
+
+Gameplay Essentials
+===================
+
+Buildings
+---------
+
+Headquarters    You start with this building.  Your enemies will come for it.
+Radar station   Can scan for this and that and provides valuable intelligence.
+Smelter         Gets minerals by smelting crystals and rocks you place nearby.
+Gas refinery    Sources gas from natural volcano-like gas vents it sits on.
+Factory         Can build various vehicles or vessels.
+Solar panel     Provides energy to a power station it is connected to.
+Power station   Makes the solar energy available to you.
+Missile silo    Can build and launch nuclear missiles.
+
+Units
+-----
+
+Builder         It can build buildings. (Duh!) It can also carry stuff.
+Tank            Can fire its cannon at various targets. Can also self-destruct
+                with an explosion.
+Heavy tank      Can fire its cannon at various targets. Can be used in statio-
+                nary, sentry mode to automatically shoot at enemy units.
+Frigate         This is basically a swimming tank. The factory needs to be at
+                the shore to build one.
+Scout           Can be used to explore the map. Cannot do anything else, yet.
+Soldier         As you can imagine, this one is not built in a factory.
+                For the time being, they are nowhere to be found.
+Fighter jet     Your researchers are still figuring out how to build these and
+                what to do with them. However, no factory will be able to
+                build both, frigates and fighter jets.
