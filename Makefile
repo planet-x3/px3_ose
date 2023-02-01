@@ -219,6 +219,7 @@ clean:
 	rm build/assets/*.cgt
 	rm build/assets/*.cmp
 	rm build/assets/*.vga
+	rm -r build/release
 
 dosbox_vga: px3_full
 	dosbox -conf dosbox/vga.conf
