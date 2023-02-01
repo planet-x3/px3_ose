@@ -200,6 +200,12 @@ build/full1200.img: assets build/px3_ose.com
 	$(foreach file,$(SOUND),$(MCOPYOPTS) mcopy -i $@ build/assets/$(file) ::$(file);)
 	$(foreach file,$(MUSIC_MIDI),$(MCOPYOPTS) mcopy -i $@ build/assets/$(file) ::$(file);)
 
+build/release: assets build/px3_ose.com
+	mkdir -p build/release/
+	cp build/assets/* build/release/
+	cp assets/maplist.bin build/release/
+	cp build/px3_ose.com build/release/
+
 .PHONY: clean dosbox_vga dosbox_cga dosbox_tandy dosbox_hercules
 
 clean:
