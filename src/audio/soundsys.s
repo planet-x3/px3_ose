@@ -918,10 +918,6 @@ ssy_tndlpt_write:
         ret
 
 
-%include "tnd_cms.s"
-%include "tnd_cmslpt.s"
-
-
 ;------------------------------------------------------------------------------
 ; Adlib stuff
 

@@ -31,7 +31,8 @@ DIAGS   equ     0       ; Used for showing diagnostic screen if F1 pressed
 
 ; macro for tail calls -- change to "call" and "ret" for easier static code analysis
 %macro tcall 1
-        jmp     %1
+        call    %1
+        ret
 %endmacro
 
 ; ---------- global variables ----------
@@ -142,25 +143,10 @@ VIDEO_HW_PCJR_OR_BETTER equ     VIDEO_HW_PCJR_OR_TANDY | VIDEO_HW_TANDY | VIDEO_
 VIDEO_HW_COMPOSITE      equ     VIDEO_HW_CGA_LIKE | VIDEO_HW_PCJR_OR_BETTER
 
 
-VIDEOMENU               db "aq",10,"Choose Video Mode: (/v)",13,10
+VIDEOMENU               db "ab",10,"Choose Video Mode: (/v)",13,10
                         db "-----------------------",13,10
-                        db "a-CGA Monochrome  640x200 / 2-color",13,10
-                        db "b-Hercules        640x300 / 2-color",13,10
-                        db "c-EGA Mono (128k) 640x350 / 3-color     (reserved, not implemented)",13,10
-                        db "d-CGA             320x200 / 4-color",13,10
-                        db "e-CGA Composite   160x200 / 16-color",13,10
-                        db "f-CGA 8x2 Chars   320x200 / 16-color    (text mode)",13,10
-                        db "g-Tandy (PC Jr.)  160x200 / 16-color",13,10
-                        db "h-Plantronics     320x200 / 16-color    (doubled pixels)",13,10
-                        db "i-Tandy           320x200 / 16-color",13,10
-                        db "j-Plantronics     320x200 / 16-color",13,10
-                        db "k-EGA (64k)       320x200 / 16-color    (reserved, not implemented)",13,10
-                        db "l-VGA (MCGA)      320x200 / 256-color",13,10
-                        db "m-VGA (mode Y)    320x200 / 256-color   (accelerated)",13,10
-                        db "n-Tandy (ETGA)    640x200 / 16-color",13,10
-                        db "o-EGA (128k)      640x200 / 16-color    (accelerated)",13,10
-                        db "p-ATI-GS          640x200 / 16-color",13,10
-                        db "q-Amstrad PC1512  640x200 / 16-color",13,10
+                        db "a-CGA             320x200 / 4-color",13,10
+                        db "b-Tandy (PC Jr.)  160x200 / 16-color",13,10
                         db "$"
 
                         ; NOTE: Video modes using the VGA artwork are grouped together.

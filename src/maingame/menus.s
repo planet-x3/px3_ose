@@ -86,6 +86,9 @@ game_menu_prepare_entries:
 
         ret
 
+fill_transparent_pixels:
+        ret
+
 ; data structure for the in-game menu
 game_menu_items:
         ; menu description
@@ -302,20 +305,6 @@ INVERT_CGA_DATA:
         ret
 
 toggle_inverted:
-        xor     word [screen_xor],0ffffh
-        jz      .now_normal
-        ; inverted
-        mov     word [convert_tiles],convert_tiles_cg2
-        mov     word [plot_string],plot_string_cga_inverted
-        mov     word [plot_string_color],plot_string_color_cg2_inverted
-        mov     word [plot8pix],plot8pix_cga_inverted
-        jmp     .end
-        .now_normal:
-        mov     word [convert_tiles],convert_tiles_cg2
-        mov     word [plot_string],plot_string_cga
-        mov     word [plot_string_color],plot_string_color_cg2
-        mov     word [plot8pix],plot8pix_cga
-        .end:
         ret
 
 ; data structure for the intro menu

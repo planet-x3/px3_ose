@@ -197,18 +197,6 @@ parse_arg_c:
 parse_arg_o:
         call    read_arg_char
         mov     [cmd_arg_o],al
-        cmp     al,'2'
-        jne     .not2
-        ; use CGA instead of CG2 tile set for Monochrome CGA mode
-        mov     byte [mode_vars_cg2.file_exts+11],'A'
-        .not2:
-        cmp     al,'4'
-        jne     .not4
-        ; use TDY instead of CMP artwork for Composite CGA mode
-        mov     byte [mode_vars_cmp.file_exts+9],'T'
-        mov     byte [mode_vars_cmp.file_exts+10],'D'
-        mov     byte [mode_vars_cmp.file_exts+11],'Y'
-        .not4:
         ret
 
 ; description:
@@ -253,17 +241,6 @@ parse_arg_p:
 parse_arg_g:
         ; grayscale video requested
         mov     byte [cmd_arg_g],1
-        ; if there are argument chars, expect exactly 16
-        call    arg_has_extra_char
-        jnc     .end
-        mov     cx,16
-        mov     bx,gray_ramp
-        .loop16:
-        call    read_hex_digit
-        mov     [bx],al
-        inc     bx
-        loop    .loop16
-        .end:
         ret
 
 ; description:

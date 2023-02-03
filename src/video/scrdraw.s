@@ -151,40 +151,6 @@ tile_to_overwrite       dw      0
 tiles_to_overwrite      resb    19*9
 
 draw_entire_screen_with_transparency:
-        mov     byte [CURSOR_X],0
-        mov     byte [CURSOR_Y],0
-        .DES01: ; we do all this stuff one time.
-        mov     ah,[CURSOR_Y]
-        add     ah,[MAP_OFFS_Y]
-        mov     al,[CURSOR_X]
-        add     al,[MAP_OFFS_X]
-        mov     si,ax
-        mov     [TEMP_MAP_LOC],ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
-        mov     [TEMP_A],al
-        call    find_screen_location
-        call    plot_tile_on_bg_vga
-        inc     byte [CURSOR_X]
-        .DES02: ; and now we just adjust as we draw across the screen.
-        inc     word [TEMP_MAP_LOC]
-        mov     si,[TEMP_MAP_LOC]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
-        mov     [TEMP_A],al
-        call    plot_tile_on_bg_vga
-        inc     byte [CURSOR_X]
-        mov     cl,[SCREEN_WIDTH]
-        cmp     [CURSOR_X],cl
-        jne     .DES02
-        mov     byte [CURSOR_X],0
-        inc     byte [CURSOR_Y]
-        cmp     byte [CURSOR_Y],9
-        jne     .DES01
         ret
 
 BROWSE_ERASE_CURSOR:
@@ -373,6 +339,9 @@ plot_tile_on_bg:
         .transparent:
         tcall   plot_tile_on_bg_vga
 
+plot_tile_on_bg_vga:
+        ret
+
 ; description:
 ;       Plot the tile with the provided index at the provided offset in
 ;       video memory offset.  Skip this if the tile stayed the same.
@@ -404,38 +373,6 @@ plot_tile:                                      ; used for plotting tile elsewhe
         inc     bx
         mov     word [tile_to_overwrite],bx
         add     di,[stride_tile]
-        ret
-
-; description:
-;       Internal tile plotting routine for Amstrad PC1512 VDU.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_pc1512:
-        mov     dx,3ddh
-        mov     al,1
-        out     dx,al
-        call    i_plot_tile_cga
-        sub     di,4
-        mov     dx,3ddh
-        mov     al,2
-        out     dx,al
-        call    i_plot_tile_cga
-        sub     di,4
-        mov     dx,3ddh
-        mov     al,4
-        out     dx,al
-        call    i_plot_tile_cga
-        sub     di,4
-        mov     dx,3ddh
-        mov     al,8
-        out     dx,al
-        call    i_plot_tile_cga
-        mov     dx,3ddh
-        mov     al,0fh
-        out     dx,al
         ret
 
 ; description:
@@ -480,48 +417,6 @@ i_plot_tile_cga:
         ret
 
 ; description:
-;       Internal tile plotting routine for Hercules mode.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_hercules:
-        mov     ax,76
-        mov     bx,7628
-        mov     cx,3
-        mov     dx,-24572
-        tcall   i_plot_tile_cga.L1
-
-; description:
-;       Internal tile plotting routine for Plantronics ColorPlus.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_plantronics:
-        mov     ax,76
-        mov     bx,7628
-        mov     cx,4
-        mov     dx,-32764
-        tcall   i_plot_tile_cga.L1
-
-; description:
-;       Internal tile plotting routine for CGA text mode.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_text:
-        mov     ax,76
-        mov     bx,7628
-        mov     cx,1
-        mov     dx,-8188
-        tcall   i_plot_tile_cga.L1
-
-; description:
 ;       Tile plotting routine for menus.
 ; parameters:
 ;       al: tile index
@@ -555,243 +450,6 @@ plot_tile_in_gui_big:
         ret
 
 ; description:
-;       Internal tile plotting routine for EGA.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_ega:
-        mov     bl, 2           ; outer loop: set bl = 2
-        push    dx
-        mov     dx,3ceh
-        mov     al,8
-        out     dx,al           ; select bit mask reg
-        inc     dx
-        mov     al,00h
-        out     dx,al           ; write bit mask reg
-        .DCT001:
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        movsb
-        movsb
-        movsb
-        movsb
-        add     di,76
-        dec     bl              ; Decrement outer loop counter
-        jnz     .DCT001         ; if not zero yet, jump to DCT001
-        add     di,15104
-        mov     dx,3ceh
-        mov     al,8
-        out     dx,al           ; select bit mask reg
-        inc     dx
-        mov     al,0ffh
-        out     dx,al           ; write bit mask reg
-        pop     dx
-        sub     di,16380
-        ret
-
-; description:
-;       Internal tile plotting routine for medium resolution Tandy mode.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_mtdy:
-        mov     ax,152
-        mov     bx,8192-3*160-8;
-        mov     cx,2
-        mov     dx,4*8192+8
-        mov     bp,0;
-
-        test    di,4000h
-        jz      .L1
-        mov     dx,4*8192+8-2*(32768+160)
-        mov     bp,32768+160;
-
-.L1:
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,bx
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,bx
-        add     di,bp
-        loop    .L1
-        add     di,dx
-        ret
-
-; description:
-;       Internal tile plotting routine for ATI Graphics Solution.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_atigs:
-        mov     ax,152
-        mov     bx,8192-3*160-8;
-        mov     cx,4
-        mov     dx,8*8192+8
-        mov     bp,0;
-
-        test    di,4000h
-        jz      .L1
-        mov     dx,8*8192+8-2*(32768+160)
-        mov     bp,32768+160;
-
-.L1:
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,bx
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,ax
-        movsw
-        movsw
-        movsw
-        movsw
-        add     di,bx
-        add     di,bp
-        cmp     cx,3
-        je      .L2
-        loop    .L1
-        add     di,dx
-        ret
-.L2:
-        sub     di,320
-        loop    .L1
-
-plot_tile_on_bg_vga:                            ; used for plotting tile elsewhere
-        ; find tile location
-        mov     si,word [TEMP_A_TIMES_256]      ; tile number multiplied by 256
-        cmp     byte [VIDEO_TRANS],1
-        jne     .L0
-        mov     bx,word [TEMP_A]                ; check if tile should be transparent
-        cmp     byte TRANSPARENCY[bx],1
-        jne     .L0
-        jmp     .L2
-        ; standard tile copy routine, no transparency
-        .L0:
-        push    ds
-        push    cx
-        mov     ds,[TILESEG]
-
-        call    i_plot_tile_vga
-
-        pop     cx
-        pop     ds
-        ret
-
-        ; transparent copy routine.
-        .L2:
-        call    get_tile_under_unit
-        push    ds
-        mov     ds,[TILESEG]                    ; ds = segment of all tile data
-
-        call    i_plot_tile_on_bg_vga
-
-        pop     ds                              ; restore default segment
-        ret
-
-; description:
 ;       Gets the tile index of the tile below the unit the cursor points at.
 ; parameters:
 ;       CURSOR_X
@@ -820,66 +478,6 @@ get_tile_under_unit:
         ; unit number should now be in si
         mov     bh,UNIT_TILE_UNDER[bx]  ; ax=TILE NUMBER * 256
         mov     bl,0
-        ret
-
-; description:
-;       Internal tile plotting routine for VGA.
-; parameters:
-;       si: tile bitmap
-;       di: destination offset in video memory
-; returns:
-;       di: next destination offset in video memory
-i_plot_tile_vga:
-        mov     ax,304
-        mov     bx,8
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        add     di,ax
-        mov     cx,bx
-        rep     movsw
-        sub     di,4800
         ret
 
 ; description:

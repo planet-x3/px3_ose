@@ -131,14 +131,6 @@ planetx3_start:
 start_game:
         mov     si,FILENAME_IN
         call    LOAD_SCREEN             ; gameplay screen
-        ; HACK: clear last line in Hercules mode to work around a graphical bug
-        cmp     word [set_video_mode],set_hercules_640x300x2
-        jne     .S0
-        mov     di,(8192*2)+(99*80)
-        xor     ax,ax
-        mov     cx,40
-        rep     stosw
-.S0:
         mov     byte [in_intro_menu],0
         ; keep playing the jukebox music track unless it is the MENU, WIN or LOSE track
         cmp     byte [active_track],0
@@ -215,37 +207,17 @@ ask_video:
         mov     bh,0
         mov     bl,al
         sub     bx,'a'
-        cmp     bx,17                   ; highest mode number
+        cmp     bx,2                    ; highest mode number
         jnb     ask_video
         shl     bx,1
         mov     si,[.block_addr_lut+bx]
         tcall   set_mode_vars           ; tail call
 
-.block_addr_lut dw      mode_vars_cg2
-                dw      mode_vars_hercules
-                dw      mode_vars       ; reserved for monochrome EGA
-                dw      mode_vars
-                dw      mode_vars_cmp
-                dw      mode_vars_text
+.block_addr_lut dw      mode_vars
                 dw      mode_vars_ltdy
-                dw      mode_vars_plantronics
-                dw      mode_vars_mtdy
-                dw      mode_vars_plantronics_2
-                dw      mode_vars       ; reserved for low-res EGA
-                dw      mode_vars_vga
-                dw      mode_vars_vga_y
-                dw      mode_vars_etga
-                dw      mode_vars_ega
-                dw      mode_vars_atigs
-                dw      mode_vars_pc1512
 
 %include "setmode.s"                    ; video mode initialization
 %include "convert.s"                    ; conversion functions for tile graphics and fade-in
-%include "ega.s"                        ; EGA routines
-%include "atigs.s"                      ; ATI Graphics Solution routines
-%include "etga.s"                       ; Tandy Video II (ETGA) routines
-%include "hercules.s"                   ; Hercules Graphics Card routines
-%include "pcplus.s"                     ; Plantronics ColorPlus routines
 %include "backgrnd.s"                   ; background AI routines
 %include "builder.s"                    ; builder routines
 %include "diskio.s"                     ; disk load routines
@@ -278,27 +250,6 @@ MAP_NAME        db "MAP--.MAP",0        ; Map name
 HEXARRAY        db "0123456789ABCDEF"
 
 %include "palsluts.s"
-
-SET_VGA_PALETTE:
-        mov     cl,0                    ; PALETTE NUMBER
-        mov     si,VGA_PALETTE
-        .L1:
-        mov     al,cl
-        mov     dx,03C8H                ; DAC WRITE
-        out     dx,al
-        mov     dx,03C9H                ; DAC DATA
-        lodsb
-        shr     al,2
-        out     dx,al                   ; DAC DATA RED
-        lodsb
-        shr     al,2
-        out     dx,al                   ; DAC DATA GREEN
-        lodsb
-        shr     al,2
-        out     dx,al                   ; DAC DATA BLUE
-        inc     cl
-        jnz     .L1
-        ret
 
 ; This exit procedore is now a combined exit+error handler.  To exit, you must
 ; use CALL EXITPROG and then the very next line MUST be a DB 'message',0 statement.

@@ -30,7 +30,7 @@
 
 SSY_SEG                 dw      0
 
-SOUNDMENU               db      "aj"
+SOUNDMENU               db      "ah"
                         db      10,"Choose audio device for music: (/a)",13,10
                         db      "-----------------------------------",13,10
                         db      "a-None",13,10
@@ -41,8 +41,6 @@ SOUNDMENU               db      "aj"
                         db      "f-OPL2LPT",13,10
                         db      "g-General MIDI (Roland SC-55, etc.)",13,10
                         db      "h-Roland MT-32 and compatibles",13,10
-                        db      "i-CMS/GameBlaster",13,10
-                        db      "j-CMSLPT",13,10
                         db      "$"
                         ; NOTE: The following letters are tentatively reserved for:
                         ;       k-Innovation SSI-2001
@@ -173,8 +171,6 @@ ask_sound:
                 dw      music_mode_vars_opl2lpt
                 dw      music_mode_vars_gm
                 dw      music_mode_vars_mt32
-                dw      music_mode_vars_cms
-                dw      music_mode_vars_cmslpt
 
 LPTsetup:
         mov     si,LPTMENU
