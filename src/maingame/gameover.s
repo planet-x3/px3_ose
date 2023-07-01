@@ -29,7 +29,8 @@ singleKeyExit   equ     1
 
 GAMEOVER_SCREEN:
         ; clear_entire_screen
-        mov     di,0
+        mov     di,xy(0,0)
+        call    [calc_screen_offset]
         mov     cx,160
         mov     bx,200
         call    [clear_rect]

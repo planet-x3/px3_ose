@@ -511,6 +511,103 @@ calc_screen_offset_ega:
 ;       di: destination offset in video memory (es)
 ;       cx: width on a logical 160x200 screen
 ;       bx: height on a logical 160x200 screen, excluding the last text line
+scroll_up_ega_mono:
+        mov     ax,bx
+        shr     ax,1
+        add     bx,ax
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al   ;select bit mask reg
+        inc     dx
+        mov     al,00h
+        out     dx,al   ;write bit mask reg
+
+        push    cx
+        push    si
+        shr     cx,1
+        mov     dx,80
+        sub     dx,cx
+        push    ds
+        push    es
+        pop     ds
+        mov     si,di
+        add     si,80*9
+.L1:
+        push    cx
+        rep     movsb
+        pop     cx
+        add     si,dx
+        add     di,dx
+        dec     bx
+        jnz     .L1
+
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al   ;select bit mask reg
+        inc     dx
+        mov     al,0ffh
+        out     dx,al   ;write bit mask reg
+
+        pop     ds
+        pop     si
+        pop     cx
+        mov     bx,6
+        tcall   clear_rect_ega_mono
+
+; description:
+;       Calculate offset in video memory from coordinates on a logical 160x200 screen.
+; parameters:
+;       di: logical coordinates (Y in upper byte, X in lower byte)
+; returns:
+;       di: offset in video memory (es)
+calc_screen_offset_ega_mono:
+        mov     cx,di
+        mov     bl,ch
+        shr     bl,1
+        sbb     bh,bh
+        and     bh,80
+        mov     al,240
+        mov     ch,0
+        mul     bl
+        add     al,bh
+        adc     ah,0
+        shr     cx,1
+        add     ax,cx
+        add     ax,2000
+        mov     di,ax
+        ret
+
+; description:
+;       Clears a rectangle on screen (nominally white) on monochrome EGA.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_white_ega_mono:
+        mov     ax,bx
+        shr     ax,1
+        add     bx,ax
+        mov     ax,0ffffh
+        tcall   clear_rect_ega.L0
+
+; description:
+;       Clears a rectangle on screen (nominally black) on monochrome EGA.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_ega_mono:
+        mov     ax,bx
+        shr     ax,1
+        add     bx,ax
+        tcall   clear_rect_ega
+
+; description:
+;       Scrolls the contents of a rectangle up by one text line (= six logical pixels).
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen, excluding the last text line
 scroll_up_vga:
         push    si
         mov     dx,320

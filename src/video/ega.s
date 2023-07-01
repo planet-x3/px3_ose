@@ -285,3 +285,174 @@ fill_transparent_pixels:
         .end:
         pop     ds
         ret
+
+%define BYTES_PER_LINE  80
+%define BYTES_PER_PLANE 6000h
+
+convert_screen_cga_to_ega_mono:
+        pusha
+        push    es
+        push    ds
+        pop     es
+
+        xor     si,si
+        mov     di,4000h
+
+        mov     bp,100
+        .yloop:
+        mov     cx,80
+        .xloop:
+
+        mov     ah,[si+8192]            ; read i1 (al) and i2 (ah)
+        lodsb
+
+        mov     dl,al
+        mov     dh,al
+        and     dx,0101010110101010b    ; dl: t1a, dh: t1b
+        shl     dh,1                    ; dh: o2v_ = t1b << 1
+        or      al,dh                   ; al: o1v
+
+        mov     [es:di],al              ; write o1v (al)
+
+        mov     al,dh
+        and     al,dl                   ; al: o2i_ = t1a & (t1b >> 1)
+        or      dh,dl                   ; dh: o2v_ (avoid stripes in dark gray)
+        mov     dl,al
+        shr     dl,1
+        or      dl,al                   ; dl: o1i
+
+        mov     [es:di+BYTES_PER_PLANE],dl      ; write o1i (dl)
+
+        mov     bl,ah
+        mov     bh,ah
+        and     bx,0101010110101010b    ; bl: t2a, bh: t2b
+        or      dh,bh                   ; dh: o2v = o2v_ | t2b
+        shl     bh,1
+        or      ah,bh                   ; ah: o3v = i2 | (t2b << 1)
+        and     bl,bh                   ; bl: temp_ = t2a & (t2b << 1)
+        mov     dl,bl
+        shr     dl,1                    ; dl: temp = (t2a >> 1) & t2b
+        or      al,dl                   ; al: o2i
+        or      dl,bl                   ; dl: o3i = temp_ | temp
+
+        mov     [es:di+BYTES_PER_LINE],dh                       ; write o2v (dh)
+        mov     [es:di+BYTES_PER_PLANE+BYTES_PER_LINE],al       ; write o2i (al)
+        mov     [es:di+(2*BYTES_PER_LINE)],ah                   ; write o3v (ah)
+        mov     [es:di+BYTES_PER_PLANE+(2*BYTES_PER_LINE)],dl   ; write o3i (dl)
+        inc     di
+
+        loop    .xloop
+        add     di,160
+        dec     bp
+        jnz     .yloop
+
+        pop     es
+        popa
+        ret
+
+convert_tiles_cga_to_ega_mono:
+        pusha
+        push    es
+        push    ds
+        pop     es
+
+        xor     si,si
+        mov     di,4000h
+
+        mov     ch,0                    ; 256
+        .tileloop:
+        mov     bp,8
+        .yloop:
+        mov     cl,4
+        .xloop:
+
+        mov     ah,[si+4*8]             ; read i1 (al) and i2 (ah)
+        lodsb
+
+        mov     dl,al
+        mov     dh,al
+        and     dx,0101010110101010b    ; dl: t1a, dh: t1b
+        shl     dh,1                    ; dh: o2v_ = t1b << 1
+        or      al,dh                   ; al: o1v
+
+        mov     [es:di],al              ; write o1v (al)
+
+        mov     al,dh
+        and     al,dl                   ; al: o2i_ = t1a & (t1b >> 1)
+        or      dh,dl                   ; dh: o2v_ (avoid stripes in dark gray)
+        mov     dl,al
+        shr     dl,1
+        or      dl,al                   ; dl: o1i
+
+        mov     [es:di+BYTES_PER_PLANE],dl      ; write o1i (dl)
+
+        mov     bl,ah
+        mov     bh,ah
+        and     bx,0101010110101010b    ; bl: t2a, bh: t2b
+        or      dh,bh                   ; dh: o2v = o2v_ | t2b
+        shl     bh,1
+        or      ah,bh                   ; ah: o3v = i2 | (t2b << 1)
+        and     bl,bh                   ; bl: temp_ = t2a & (t2b << 1)
+        mov     dl,bl
+        shr     dl,1                    ; dl: temp = (t2a >> 1) & t2b
+        or      al,dl                   ; al: o2i
+        or      dl,bl                   ; dl: o3i = temp_ | temp
+
+        mov     [es:di+4],dh                            ; write o2v (dh)
+        mov     [es:di+BYTES_PER_PLANE+4],al            ; write o2i (al)
+        mov     [es:di+(2*4)],ah                        ; write o3v (ah)
+        mov     [es:di+BYTES_PER_PLANE+(2*4)],dl        ; write o3i (dl)
+        inc     di
+
+        dec     cl
+        jnz     .xloop
+        add     di,2*4
+        dec     bp
+        jnz     .yloop
+        add     si,8*4
+        dec     ch
+        jnz     .tileloop
+
+        pop     es
+        popa
+        ret
+
+fadein_pixel_xfer_ega_mono:
+        cmp     si,24000
+        jae     .end
+        pusha
+        add     si,4000h
+        add     di,2000
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,01h
+        out     dx,al
+
+        mov     al,[si]
+        mov     [es:di],al
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,04h
+        out     dx,al
+
+        add     si,6000h
+        movsb
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,0fh
+        out     dx,al
+
+        popa
+        .end:
+        inc     si
+        inc     di
+        ret

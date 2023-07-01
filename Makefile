@@ -217,6 +217,9 @@ clean:
 dosbox_vga: px3_full
 	dosbox -conf dosbox/vga.conf
 
+dosbox_ega: px3_full
+	dosbox -conf dosbox/ega.conf
+
 dosbox_cga: px3_full
 	dosbox -conf dosbox/cga.conf
 

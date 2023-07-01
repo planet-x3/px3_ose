@@ -549,6 +549,31 @@ plot_string_color_ega:
         ret
 
 ; description:
+;       String plotting routine for EGA mono.
+; parameters:
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_ega_mono:
+        add     di,80
+        call    plot_string_ega
+        sub     di,80
+        ret
+
+; description:
+;       String plotting routine for EGA mono (color, i.e. non-black bg).
+; parameters:
+;       font_bg_color: background color in mode-specific format
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color_ega_mono:
+        add     di,80
+        call    plot_string_color_ega
+        sub     di,80
+        ret
+
+; description:
 ;       String plotting routine for Amstrad PC1512 VDU (color).
 ; parameters:
 ;       font_bg_color: background color in mode-specific format

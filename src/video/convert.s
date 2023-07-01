@@ -240,6 +240,63 @@ convert_tiles_gs:
         ret
 
 ; description:
+;       Converts an entire CGA tileset for monochrome EGA mode and takes care
+;       of storing it in VRAM bitplanes.
+convert_tiles_ega_mono:
+        push    ds
+        push    es
+
+        mov     ds,[SCRATCHSEG]
+        call    convert_tiles_cga_to_ega_mono
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,01h
+        out     dx,al
+
+        ; copy video data
+        mov     es,[cs:TILESEG]
+        mov     si,4000h
+        xor     di,di
+        mov     ax,256
+.loop1:
+        mov     cx,4*24
+        rep     movsb
+        add     di,4*8
+        dec     ax
+        jnz     .loop1
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,04h
+        out     dx,al
+
+        ; copy intensity data
+        xor     di,di
+        mov     ax,256
+.loop2:
+        mov     cx,4*24
+        rep     movsb
+        add     di,4*8
+        dec     ax
+        jnz     .loop2
+
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,0fh
+        out     dx,al
+
+        pop     es
+        pop     ds
+        ret
+
+; description:
 ;       Runs an entire VGA tileset through a color LUT, translates it to an
 ;       EGA-friendly format and takes care of storing it in VRAM bitplanes.
 convert_tiles_ega:

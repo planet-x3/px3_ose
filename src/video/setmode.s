@@ -415,6 +415,20 @@ set_video_mode_ega:
         ret
 
 ; description:
+;       Sets the 640x350x3 EGA mode.
+set_video_mode_ega_mono:
+        ; set EGA mode 0fh (640x350x3)
+        mov     ax,000fh
+        int     10h
+        call    gen_gray_luts_if_needed
+        call    prepare_color_vars_ega
+        ; adjust memory layout
+        mov     ax,[SCRATCHSEG]
+        mov     [TILELOADSEG],ax
+        mov     word [TILESEG],0a800h
+        ret
+
+; description:
 ;       Sets Plantronics ColorPlus mode for use with Tandy artwork.
 set_video_mode_plantronics:
         call    set_plantronics_320x200x16
@@ -491,7 +505,12 @@ detect_video_hw:
         cmp     bl,10h
         je      .check_for_mda
         mov     word [video_hw],VIDEO_HW_EGA
-        ; does the EGA have at least 128KiB of RAM?
+        ; does the EGA have at least 256KiB/128KiB of RAM?
+        cmp     bl,3
+        jb      .ega_128k
+        mov     word [video_hw],VIDEO_HW_EGA256
+        jmp     .end
+        .ega_128k:
         cmp     bl,1
         jb      .ega_64k
         mov     word [video_hw],VIDEO_HW_EGA128

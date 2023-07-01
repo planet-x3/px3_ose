@@ -136,6 +136,7 @@ VIDEO_HW_TANDY          equ     100000b
 VIDEO_HW_CGA_LIKE       equ     1000000b
 VIDEO_HW_MCGA           equ     10000000b
 VIDEO_HW_EGA128         equ     100000000b
+VIDEO_HW_EGA256         equ     1000000000b
 
 VIDEO_HW_CGA_OR_BETTER  equ     VIDEO_HW_CGA_LIKE | VIDEO_HW_PCJR_OR_TANDY | VIDEO_HW_TANDY | VIDEO_HW_ETGA | VIDEO_HW_EGA | VIDEO_HW_VGA
 VIDEO_HW_PCJR_OR_BETTER equ     VIDEO_HW_PCJR_OR_TANDY | VIDEO_HW_TANDY | VIDEO_HW_ETGA
@@ -146,7 +147,7 @@ VIDEOMENU               db "aq",10,"Choose Video Mode: (/v)",13,10
                         db "-----------------------",13,10
                         db "a-CGA Monochrome  640x200 / 2-color",13,10
                         db "b-Hercules        640x300 / 2-color",13,10
-                        db "c-EGA Mono (128k) 640x350 / 3-color     (reserved, not implemented)",13,10
+                        db "c-EGA Mono (256k) 640x350 / 3-color     (accelerated)",13,10
                         db "d-CGA             320x200 / 4-color",13,10
                         db "e-CGA Composite   160x200 / 16-color",13,10
                         db "f-CGA 8x2 Chars   320x200 / 16-color    (text mode)",13,10

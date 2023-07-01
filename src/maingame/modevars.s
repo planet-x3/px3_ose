@@ -625,9 +625,63 @@ mode_vars_atigs:
 ;----------------------------------------
 
 align   2
+mode_vars_ega_mono:
+
+.video_hw_needed        dw      VIDEO_HW_EGA256 | VIDEO_HW_VGA
+.VIDEO_SEG              dw      0a000h  ; Segment for video output
+
+; colors for GUI elements
+.font_bg_black          dw      0
+.font_bg_norm           dw      1
+.font_bg_norm_bright    dw      1
+.font_bg_alt            dw      1
+.font_bg_alt_bright     dw      1
+.font_bg_frame          dw      0
+.radar_color_hydro      dw      1
+.radar_color_thermal    dw      1
+.radar_color_osc        dw      1
+.radar_color_metal      dw      1
+.radar_color_marker     dw      15
+.radar_color_frame      dw      15
+
+.stride_tile            dw      4
+.framebuf_size          dw      16384
+.font_size              dw      610
+.tileset_size           dw      16384
+.tileseg_paragraphs     dw      0
+.tile_offset_shift_val  dw      1
+.tile_row_offset        dw      1920
+
+.fadestep_chunks        dw      (10000h / FADESTEPS)    ; FADESTEP chunks totaling VGA RAM size
+.lfsr_tap_bits          dw      1101000000001000B       ; optimal 2^16 tap bits are 16,15,13,4
+
+.file_exts              db      "CGACGACGACGA"
+
+.plot_cursor            dw      plot_cursor_ega_mono
+.plot_cursor_big        dw      plot_cursor_big_ega_mono
+.i_plot_tile            dw      i_plot_tile_ega_mono
+.plot_string            dw      plot_string_ega_mono
+.plot_string_color      dw      plot_string_color_ega_mono
+.plot8pix               dw      plot8pix_ega
+.scroll_up              dw      scroll_up_ega_mono
+.clear_rect             dw      clear_rect_ega_mono
+.clear_rect_white       dw      clear_rect_white_ega_mono
+.calc_screen_offset     dw      calc_screen_offset_ega_mono
+.mode_specific_entry    dw      dummy_func
+.mode_specific_string   dw      menu_string_transparency_n_a
+.set_video_mode         dw      set_video_mode_ega_mono
+.restore_old_mode       dw      restore_old_mode_generic
+
+.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_ega_mono
+.convert_tiles          dw      convert_tiles_ega_mono
+.convert_screen         dw      convert_screen_cga_to_ega_mono
+
+;----------------------------------------
+
+align   2
 mode_vars_ega:
 
-.video_hw_needed        dw      VIDEO_HW_EGA128 | VIDEO_HW_VGA
+.video_hw_needed        dw      VIDEO_HW_EGA128 | VIDEO_HW_EGA256 | VIDEO_HW_VGA
 .VIDEO_SEG              dw      0a000h  ; Segment for video output
 
 ; colors for GUI elements

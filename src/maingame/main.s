@@ -223,7 +223,7 @@ ask_video:
 
 .block_addr_lut dw      mode_vars_cg2
                 dw      mode_vars_hercules
-                dw      mode_vars       ; reserved for monochrome EGA
+                dw      mode_vars_ega_mono
                 dw      mode_vars
                 dw      mode_vars_cmp
                 dw      mode_vars_text

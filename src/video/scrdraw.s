@@ -555,6 +555,19 @@ plot_tile_in_gui_big:
         ret
 
 ; description:
+;       Internal tile plotting routine for monochrome EGA.
+; parameters:
+;       si: tile bitmap
+;       di: destination offset in video memory
+; returns:
+;       di: next destination offset in video memory
+i_plot_tile_ega_mono:
+        mov     bl,3            ; outer loop: set bl = 3
+        call    i_plot_tile_ega.skip_bl_init
+        sub     di,80*8
+        ret
+
+; description:
 ;       Internal tile plotting routine for EGA.
 ; parameters:
 ;       si: tile bitmap
@@ -562,7 +575,8 @@ plot_tile_in_gui_big:
 ; returns:
 ;       di: next destination offset in video memory
 i_plot_tile_ega:
-        mov     bl, 2           ; outer loop: set bl = 2
+        mov     bl,2            ; outer loop: set bl = 2
+        .skip_bl_init:
         push    dx
         mov     dx,3ceh
         mov     al,8

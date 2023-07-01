@@ -278,7 +278,19 @@ plot_cursor_big_text:
 ;       Plot a graphical unit selection cursor.
 ; parameters:
 ;       di: destination offset in video memory (es)
+plot_cursor_ega_mono:
+        ; lines - 1
+        mov     bh,23
+        tcall   plot_cursor_ega.skip_lines_init
+
+; description:
+;       Plot a graphical unit selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
 plot_cursor_ega:
+        ; lines - 1
+        mov     bh,15
+.skip_lines_init:
         ; draw the top line
         mov     al,11001100b
         mov     cx,4
@@ -293,6 +305,7 @@ plot_cursor_ega:
         inc     dx
         mov     al,11000000b
         out     dx,al
+        push    di
 .left:
         add     di,80
         mov     al,byte [es:di]
@@ -301,8 +314,9 @@ plot_cursor_ega:
         sar     al,1
         mov     byte [es:di],al
         inc     bl
-        cmp     bl,15
+        cmp     bl,bh
         jne     .left
+        pop     di
 
         ; draw the right line
         dec     dx
@@ -311,7 +325,7 @@ plot_cursor_ega:
         inc     dx
         mov     al,11b
         out     dx,al
-        sub     di,1277
+        sub     di,77
         mov     bl,0
 .right:
         add     di,80
@@ -322,7 +336,7 @@ plot_cursor_ega:
         rol     al,2
         mov     byte [es:di],al
         inc     bl
-        cmp     bl,15
+        cmp     bl,bh
         jne     .right
 
         ; draw the bottom line
@@ -342,7 +356,19 @@ plot_cursor_ega:
 ;       Plot a big graphical building selection cursor.
 ; parameters:
 ;       di: destination offset in video memory (es)
+plot_cursor_big_ega_mono:
+        ; lines - 1
+        mov     bh,47
+        tcall   plot_cursor_big_ega.skip_lines_init
+
+; description:
+;       Plot a big graphical building selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
 plot_cursor_big_ega:
+        ; lines - 1
+        mov     bh,31
+.skip_lines_init:
         ; draw the top line
         mov     al,11001100b
         mov     cx,8
@@ -357,6 +383,7 @@ plot_cursor_big_ega:
         inc     dx
         mov     al,11000000b
         out     dx,al
+        push    di
 .left:
         add     di,80
         mov     al,byte [es:di]
@@ -365,8 +392,9 @@ plot_cursor_big_ega:
         sar     al,1
         mov     byte [es:di],al
         inc     bl
-        cmp     bl,31
+        cmp     bl,bh
         jne     .left
+        pop     di
 
         ; draw the right line
         dec     dx
@@ -375,7 +403,7 @@ plot_cursor_big_ega:
         inc     dx
         mov     al,11b
         out     dx,al
-        sub     di,2553
+        sub     di,73
         mov     bl,0
 .right:
         add     di,80
@@ -386,7 +414,7 @@ plot_cursor_big_ega:
         rol     al,2
         mov     byte [es:di],al
         inc     bl
-        cmp     bl,31
+        cmp     bl,bh
         jne     .right
 
         ; draw the bottom line
