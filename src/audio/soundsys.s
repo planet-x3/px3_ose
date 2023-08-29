@@ -921,6 +921,8 @@ ssy_tndlpt_write:
 %include "tnd_cms.s"
 %include "tnd_cmslpt.s"
 
+%include "tnd_ssi.s"
+
 
 ;------------------------------------------------------------------------------
 ; Adlib stuff

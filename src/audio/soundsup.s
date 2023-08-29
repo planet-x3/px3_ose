@@ -30,7 +30,7 @@
 
 SSY_SEG                 dw      0
 
-SOUNDMENU               db      "aj"
+SOUNDMENU               db      "al"
                         db      10,"Choose audio device for music: (/a)",13,10
                         db      "-----------------------------------",13,10
                         db      "a-None",13,10
@@ -43,10 +43,10 @@ SOUNDMENU               db      "aj"
                         db      "h-Roland MT-32 and compatibles",13,10
                         db      "i-CMS/GameBlaster",13,10
                         db      "j-CMSLPT",13,10
+                        db      "k-Innovation SSI-2001",13,10
+                        db      "l-LPTSID",13,10
                         db      "$"
                         ; NOTE: The following letters are tentatively reserved for:
-                        ;       k-Innovation SSI-2001
-                        ;       l-LPTSID
                         ;       m-Mockingboard
                         ;       n-AY-LPT
 
@@ -146,7 +146,7 @@ ask_sound:
         mov     bh,0
         mov     bl,al
         sub     bx,'a'
-        cmp     bx,10                   ; highest sound device number
+        cmp     bx,12                   ; highest sound device number
         jnb     ask_sound
         shl     bx,1
         mov     si,[.block_addr_lut+bx]
@@ -175,6 +175,8 @@ ask_sound:
                 dw      music_mode_vars_mt32
                 dw      music_mode_vars_cms
                 dw      music_mode_vars_cmslpt
+                dw      music_mode_vars_ssi2001
+                dw      music_mode_vars_lptsid
 
 LPTsetup:
         mov     si,LPTMENU
