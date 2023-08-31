@@ -434,6 +434,144 @@ plot_cursor_big_ega:
 ;       Plot a graphical unit selection cursor.
 ; parameters:
 ;       di: destination offset in video memory (es)
+plot_cursor_ega_low:
+        ; lines - 1
+        mov     bh,15
+.skip_lines_init:
+        ; draw the top line
+        mov     al,10101010b
+        stosb
+        stosb
+        sub     di,2
+        mov     bl,0
+
+        ; draw the left line
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,10000000b
+        out     dx,al
+        push    di
+.left:
+        add     di,40
+        mov     al,byte [es:di]
+        mov     al,bl
+        ror     al,1
+        sar     al,1
+        mov     byte [es:di],al
+        inc     bl
+        cmp     bl,bh
+        jne     .left
+        pop     di
+
+        ; draw the right line
+        dec     dx
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,00000001b
+        out     dx,al
+        sub     di,39
+        mov     bl,0
+.right:
+        add     di,40
+        mov     al,byte [es:di]
+        mov     al,bl
+        ror     al,1
+        sar     al,1
+        rol     al,2
+        mov     byte [es:di],al
+        inc     bl
+        cmp     bl,bh
+        jne     .right
+
+        ; draw the bottom line
+        dec     dx
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,11111111b
+        out     dx,al
+        add     di,39
+        mov     al,01010101b
+        stosb
+        stosb
+        ret
+
+; description:
+;       Plot a big graphical building selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
+plot_cursor_big_ega_low:
+        ; lines - 1
+        mov     bh,31
+.skip_lines_init:
+        ; draw the top line
+        mov     al,10101010b
+        mov     cx,4
+        rep     stosb
+        sub     di,4
+        mov     bl,0
+
+        ; draw the left line
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,10000000b
+        out     dx,al
+        push    di
+.left:
+        add     di,40
+        mov     al,byte [es:di]
+        mov     al,bl
+        ror     al,1
+        sar     al,1
+        mov     byte [es:di],al
+        inc     bl
+        cmp     bl,bh
+        jne     .left
+        pop     di
+
+        ; draw the right line
+        dec     dx
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,00000001b
+        out     dx,al
+        sub     di,37
+        mov     bl,0
+.right:
+        add     di,40
+        mov     al,byte [es:di]
+        mov     al,bl
+        ror     al,1
+        sar     al,1
+        rol     al,2
+        mov     byte [es:di],al
+        inc     bl
+        cmp     bl,bh
+        jne     .right
+
+        ; draw the bottom line
+        dec     dx
+        mov     al,8
+        out     dx,al
+        inc     dx
+        mov     al,11111111b
+        out     dx,al
+        add     di,37
+        mov     al,01010101b
+        mov     cx,4
+        rep     stosb
+        ret
+
+; description:
+;       Plot a graphical unit selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
 plot_cursor_mtdy:
         push    di
 

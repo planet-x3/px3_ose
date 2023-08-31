@@ -319,6 +319,32 @@ plot8pix_ega:
 ;       bp: color
 ; returns:
 ;       di: next destination offset in video memory (es)
+plot8pix_ega_low:
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     ax,bp
+        out     dx,al
+        mov     al,ch
+        stosb
+        mov     dx,3c4h
+        mov     al,2
+        out     dx,al
+        inc     dx
+        mov     al,0fh
+        out     dx,al
+        ret
+
+; description:
+;       Plotting routine for a horizontally aligned group of nominally
+;       eight pixels on nominally black background.
+; parameters:
+;       ch: bitmask
+;       di: destination offset in video memory (es)
+;       bp: color
+; returns:
+;       di: next destination offset in video memory (es)
 plot8pix_pc1512:
         mov     dx,3ddh
         mov     ax,bp

@@ -733,6 +733,60 @@ mode_vars_ega:
 ;----------------------------------------
 
 align   2
+mode_vars_ega_low:
+
+.video_hw_needed        dw      VIDEO_HW_EGA | VIDEO_HW_EGA128 | VIDEO_HW_EGA256 | VIDEO_HW_VGA
+.VIDEO_SEG              dw      0a000h  ; Segment for video output
+
+; colors for GUI elements
+.font_bg_black          dw      0
+.font_bg_norm           dw      1
+.font_bg_norm_bright    dw      9
+.font_bg_alt            dw      4
+.font_bg_alt_bright     dw      12
+.font_bg_frame          dw      8
+.radar_color_hydro      dw      1
+.radar_color_thermal    dw      12
+.radar_color_osc        dw      8
+.radar_color_metal      dw      14
+.radar_color_marker     dw      15
+.radar_color_frame      dw      15
+
+.stride_tile            dw      2
+.framebuf_size          dw      64000
+.font_size              dw      305
+.tileset_size           dw      65535   ; we cannot get closer to 64 KiB
+.tileseg_paragraphs     dw      0
+.tile_offset_shift_val  dw      3
+.tile_row_offset        dw      640
+
+.fadestep_chunks        dw      (4000h / FADESTEPS)     ; FADESTEP chunks totaling CGA RAM size
+.lfsr_tap_bits          dw      0010000000010101B       ; optimal 2^14 tap bits are 14,5,3,1
+
+.file_exts              db      "VGAVGAVGAVGA"
+
+.plot_cursor            dw      plot_cursor_ega_low
+.plot_cursor_big        dw      plot_cursor_big_ega_low
+.i_plot_tile            dw      i_plot_tile_ega_low
+.plot_string            dw      plot_string_ega_low
+.plot_string_color      dw      plot_string_color_ega_low
+.plot8pix               dw      plot8pix_ega_low
+.scroll_up              dw      scroll_up_ega_low
+.clear_rect             dw      clear_rect_ega_low
+.clear_rect_white       dw      clear_rect_white_ega_low
+.calc_screen_offset     dw      calc_screen_offset_ega_low
+.mode_specific_entry    dw      dummy_func
+.mode_specific_string   dw      menu_string_transparency_n_a
+.set_video_mode         dw      set_video_mode_ega_low
+.restore_old_mode       dw      restore_old_mode_generic
+
+.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_ega
+.convert_tiles          dw      convert_tiles_ega_low
+.convert_screen         dw      convert_to_irgb_and_reorder_for_ega
+
+;----------------------------------------
+
+align   2
 mode_vars_vga_y:
 
 .video_hw_needed        dw      VIDEO_HW_VGA

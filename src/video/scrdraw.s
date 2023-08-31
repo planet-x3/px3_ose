@@ -639,6 +639,61 @@ i_plot_tile_ega:
         ret
 
 ; description:
+;       Internal tile plotting routine for EGA.
+; parameters:
+;       si: tile bitmap
+;       di: destination offset in video memory
+; returns:
+;       di: next destination offset in video memory
+i_plot_tile_ega_low:
+        mov     bl,2            ; outer loop: set bl = 2
+        .skip_bl_init:
+        push    dx
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al           ; select bit mask reg
+        inc     dx
+        mov     al,00h
+        out     dx,al           ; write bit mask reg
+        .DCT001:
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        movsb
+        movsb
+        add     di,38
+        dec     bl              ; Decrement outer loop counter
+        jnz     .DCT001         ; if not zero yet, jump to DCT001
+        add     di,7552
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al           ; select bit mask reg
+        inc     dx
+        mov     al,0ffh
+        out     dx,al           ; write bit mask reg
+        pop     dx
+        sub     di,8190
+        ret
+
+; description:
 ;       Internal tile plotting routine for medium resolution Tandy mode.
 ; parameters:
 ;       si: tile bitmap

@@ -316,6 +316,25 @@ convert_tiles_ega:
         ret
 
 ; description:
+;       Runs an entire VGA tileset through a color LUT, translates it to an
+;       EGA-friendly format and takes care of storing it in VRAM bitplanes.
+convert_tiles_ega_low:
+        call    fill_transparent_pixels
+        push    ds
+        push    es
+        mov     es,[TILESEG]
+        mov     ds,[SCRATCHSEG]
+        xor     si,si
+        xor     di,di
+        mov     cx,0ffffh
+        call    convert_to_irgb_and_reorder_for_ega
+        mov     cx,2000h
+        call    copy_interleaved_bytes_to_vram_bitplanes
+        pop     es
+        pop     ds
+        ret
+
+; description:
 ;       Translates an entire VGA to a VGA "mode Y" friendly format and takes
 ;       care of storing it in VRAM bitplanes.
 convert_tiles_vga_y:

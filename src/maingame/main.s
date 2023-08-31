@@ -231,7 +231,7 @@ ask_video:
                 dw      mode_vars_plantronics
                 dw      mode_vars_mtdy
                 dw      mode_vars_plantronics_2
-                dw      mode_vars       ; reserved for low-res EGA
+                dw      mode_vars_ega_low
                 dw      mode_vars_vga
                 dw      mode_vars_vga_y
                 dw      mode_vars_etga

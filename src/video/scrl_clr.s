@@ -489,6 +489,90 @@ clear_rect_ega:
         ret
 
 ; description:
+;       Scrolls the contents of a rectangle up by one text line (= six logical pixels).
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen, excluding the last text line
+scroll_up_ega_low:
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al   ;select bit mask reg
+        inc     dx
+        mov     al,00h
+        out     dx,al   ;write bit mask reg
+
+        push    cx
+        push    si
+        shr     cx,2
+        mov     dx,40
+        sub     dx,cx
+        push    ds
+        push    es
+        pop     ds
+        mov     si,di
+        add     si,40*6
+.L1:
+        push    cx
+        rep     movsb
+        pop     cx
+        add     si,dx
+        add     di,dx
+        dec     bx
+        jnz     .L1
+
+        mov     dx,3ceh
+        mov     al,8
+        out     dx,al   ;select bit mask reg
+        inc     dx
+        mov     al,0ffh
+        out     dx,al   ;write bit mask reg
+
+        pop     ds
+        pop     si
+        pop     cx
+        mov     bx,6
+        tcall   clear_rect_ega_low
+
+; description:
+;       Clears a rectangle on screen (nominally white) on EGA.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_white_ega_low:
+        mov     ax,0ffffh
+        tcall   clear_rect_ega_low.L0
+
+; description:
+;       Clears a rectangle on screen (nominally black) on EGA.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_ega_low:
+        xor     ax,ax
+.L0:
+        mov     dx,80
+        shr     cx,1
+        sub     dx,cx
+        inc     dx
+        shr     dx,1
+.L1:
+        push    cx
+        shr     cx,1
+        shr     cx,1
+        jnc     .L2
+        stosb
+.L2:
+        rep     stosw
+        add     di,dx
+        pop     cx
+        dec     bx
+        jnz     .L1
+        ret
+
+; description:
 ;       Calculate offset in video memory from coordinates on a logical 160x200 screen.
 ; parameters:
 ;       di: logical coordinates (Y in upper byte, X in lower byte)
@@ -503,6 +587,17 @@ calc_screen_offset_ega:
         add     ax,cx
         shr     ax,1
         mov     di,ax
+        ret
+
+; description:
+;       Calculate offset in video memory from coordinates on a logical 160x200 screen.
+; parameters:
+;       di: logical coordinates (Y in upper byte, X in lower byte)
+; returns:
+;       di: offset in video memory (es)
+calc_screen_offset_ega_low:
+        call    calc_screen_offset_ega
+        shr     di,1
         ret
 
 ; description:

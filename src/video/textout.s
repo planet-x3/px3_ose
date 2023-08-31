@@ -549,6 +549,69 @@ plot_string_color_ega:
         ret
 
 ; description:
+;       String plotting routine for EGA (low-res).
+; parameters:
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_ega_low:
+.L1:
+        lodsb                   ; load character
+        sub     al,32           ; make relative to whitespace
+        mov     ah,0
+        push    si
+        mov     si,ax           ; multiply with 5
+        shl     ax,2
+        add     si,ax
+        add     si,FONT         ; make index into font data
+
+        movsb                   ; first scanline of character
+        add     di,39
+        movsb                   ; second scanline of character
+        add     di,39
+        movsb                   ; third scanline of character
+        add     di,39
+        movsb                   ; fourth scanline of character
+        add     di,39
+        movsb                   ; fifth scanline of character
+        sub     di,160
+
+        pop     si
+        loop    .L1
+        ret
+
+; description:
+;       String plotting routine for EGA (low-res, color).
+; parameters:
+;       font_bg_color: background color in mode-specific format
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color_ega_low:
+        push    dx
+        mov     dx,3ceh
+        mov     al,0            ; set/reset
+        out     dx,al
+        inc     dx
+        mov     al,byte [font_bg_color]
+        out     dx,al
+        dec     dx
+        mov     al,1            ; enable set/reset
+        out     dx,al
+        inc     dx
+        mov     al,byte [font_bg_color]
+        out     dx,al
+        call    plot_string_ega_low
+        mov     dx,3ceh
+        mov     al,1            ; enable set/reset
+        out     dx,al
+        inc     dx
+        mov     al,0
+        out     dx,al
+        pop     dx
+        ret
+
+; description:
 ;       String plotting routine for EGA mono.
 ; parameters:
 ;       si: string

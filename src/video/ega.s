@@ -63,8 +63,8 @@ convert_to_irgb_pairs_and_reorder_for_ega:
         pop     di,es
         mov     bx,VGA_TO_ETGA_LUT
         shr     cx,2
-        mov     [cs:ctiparfe_counter],cx
-ctiparfe_loop:
+        mov     [cs:.counter],cx
+.loop:
         lodsw
         cs xlatb
         xchg    al,ah
@@ -163,15 +163,153 @@ ctiparfe_loop:
         mov     ax,cx
         stosw
 
-        dec     word [cs:ctiparfe_counter]
-        jz      ctiparfe_end
-        jmp     ctiparfe_loop
+        dec     word [cs:.counter]
+        jz      .end
+        jmp     .loop
 
-ctiparfe_end:
+.end:
         pop     es,bp,di,si,dx,cx,bx,ax
         ret
 
-        ctiparfe_counter dw 0
+        .counter dw 0
+
+; convert to IRGB and reorder 8x(IRGB) to 8xI, 8xR, 8xG and 8xB
+convert_to_irgb_and_reorder_for_ega:
+        push    ax,bx,cx,dx,si,di,bp,es
+
+        push    ds,si
+        pop     di,es
+        mov     bx,VGA_TO_ETGA_LUT
+        shr     cx,3
+        mov     [cs:.counter],cx
+.loop:
+        lodsw
+        cs xlatb
+        xchg    al,ah
+        cs xlatb
+        shr     al,4
+        or      ah,al
+        mov     dh,ah
+        lodsw
+        cs xlatb
+        xchg    al,ah
+        cs xlatb
+        shr     al,4
+        or      ah,al
+        mov     dl,ah
+        lodsw
+        cs xlatb
+        xchg    al,ah
+        cs xlatb
+        shr     al,4
+        or      ah,al
+        mov     bp,ax
+        lodsw
+        cs xlatb
+        xchg    al,ah
+        cs xlatb
+        shr     al,4
+        or      al,ah
+        and     bp,0ff00h
+        mov     ah,0
+        or      bp,ax
+
+        ; shortcut for black pixels
+        test    dx,dx
+        jnz     .not_black
+        test    bp,bp
+        jnz     .not_black
+        xor     cx,cx
+        xor     ax,ax
+        jmp     .write_result
+
+.not_black:
+        shl     dx,1
+        rcl     ch,1
+        shl     dx,1
+        rcl     cl,1
+        shl     dx,1
+        rcl     ah,1
+        shl     dx,1
+        rcl     al,1
+
+        shl     dx,1
+        rcl     ch,1
+        shl     dx,1
+        rcl     cl,1
+        shl     dx,1
+        rcl     ah,1
+        shl     dx,1
+        rcl     al,1
+
+        shl     dx,1
+        rcl     ch,1
+        shl     dx,1
+        rcl     cl,1
+        shl     dx,1
+        rcl     ah,1
+        shl     dx,1
+        rcl     al,1
+
+        shl     dx,1
+        rcl     ch,1
+        shl     dx,1
+        rcl     cl,1
+        shl     dx,1
+        rcl     ah,1
+        shl     dx,1
+        rcl     al,1
+
+        shl     bp,1
+        rcl     ch,1
+        shl     bp,1
+        rcl     cl,1
+        shl     bp,1
+        rcl     ah,1
+        shl     bp,1
+        rcl     al,1
+
+        shl     bp,1
+        rcl     ch,1
+        shl     bp,1
+        rcl     cl,1
+        shl     bp,1
+        rcl     ah,1
+        shl     bp,1
+        rcl     al,1
+
+        shl     bp,1
+        rcl     ch,1
+        shl     bp,1
+        rcl     cl,1
+        shl     bp,1
+        rcl     ah,1
+        shl     bp,1
+        rcl     al,1
+
+        shl     bp,1
+        rcl     ch,1
+        shl     bp,1
+        rcl     cl,1
+        shl     bp,1
+        rcl     ah,1
+        shl     bp,1
+        rcl     al,1
+
+.write_result:
+        stosw
+        mov     ax,cx
+        stosw
+
+        dec     word [cs:.counter]
+        jz      .end
+        jmp     .loop
+
+.end:
+        pop     es,bp,di,si,dx,cx,bx,ax
+        ret
+
+        .counter dw 0
 
 copy_interleaved_bytes_to_vram_bitplanes:
         push    ax,bx,dx

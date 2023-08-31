@@ -415,6 +415,29 @@ set_video_mode_ega:
         ret
 
 ; description:
+;       Sets the 320x200x16 EGA mode.
+set_video_mode_ega_low:
+        ; set EGA mode 0dh (320x200x16)
+        mov     ax,000dh
+        int     10h
+        call    gen_gray_luts_if_needed
+        call    prepare_color_vars_ega
+        ; adjust memory layout
+        mov     ax,[SCRATCHSEG]
+        mov     [TILELOADSEG],ax
+        mov     word [TILESEG],0a200h
+        ; set the correct LUT
+        push    es,di
+        push    ds
+        pop     es
+        mov     di,VGA_TO_GS_LUT
+        mov     si,VGA_TO_IRGB_LUT
+        mov     cx,128
+        rep     movsw
+        pop     di,es
+        ret
+
+; description:
 ;       Sets the 640x350x3 EGA mode.
 set_video_mode_ega_mono:
         ; set EGA mode 0fh (640x350x3)
