@@ -526,6 +526,8 @@ load_tiles_o2:
         ; temporarily alter LUT entries
         cmp     byte [cmd_arg_g],1
         je      .patching_done
+        cmp     byte [VGA_TO_ETGA_LUT+7],70h
+        je      .patching_done
         cmp     byte [VGA_TO_ETGA_LUT+7],0fh
         jne     .not_0fh
         mov     byte [VGA_TO_ETGA_LUT+7],77h
@@ -581,6 +583,8 @@ load_tiles_o2:
         ; restore altered LUT entries
         cmp     byte [cmd_arg_g],1
         je      .backpatching_done
+        cmp     byte [VGA_TO_ETGA_LUT+7],70h
+        je      .backpatching_done
         cmp     byte [VGA_TO_ETGA_LUT+7],77h
         jne     .not_77h
         mov     byte [VGA_TO_ETGA_LUT+7],0fh
@@ -601,6 +605,8 @@ load_tiles_o2:
 load_tiles_o4:
         ; temporarily alter LUT entries
         cmp     byte [cs:cmd_arg_g],1
+        je      .patching_done
+        cmp     byte [VGA_TO_ETGA_LUT+7],70h
         je      .patching_done
         cmp     byte [cs:VGA_TO_ETGA_LUT+7],0fh
         jne     .not_0fh
@@ -656,6 +662,8 @@ load_tiles_o4:
 
         ; restore altered LUT entries
         cmp     byte [cmd_arg_g],1
+        je      .backpatching_done
+        cmp     byte [VGA_TO_ETGA_LUT+7],70h
         je      .backpatching_done
         cmp     byte [VGA_TO_ETGA_LUT+7],77h
         jne     .not_77h
