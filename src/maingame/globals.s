@@ -35,6 +35,58 @@ DIAGS   equ     0       ; Used for showing diagnostic screen if F1 pressed
         ret
 %endmacro
 
+%macro GET_MAP_BYTE 1
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     al,byte [%1]
+        pop     ds
+%endmacro
+
+%macro GET_MAP_BYTE_IN_BL 1
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     bl,byte [%1]
+        pop     ds
+%endmacro
+
+%macro GET_MAP_BYTE_IN_CL 1
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     cl,byte [%1]
+        pop     ds
+%endmacro
+
+%macro SET_MAP_BYTE 2
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     byte [%1],%2
+        pop     ds
+%endmacro
+
+%macro GET_SET_MAP_BYTE 2
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     al,byte [%1]
+        mov     byte [%1],%2
+        pop     ds
+%endmacro
+
+%macro SET_MAP_BIG_BUILDING_DI_BL 0
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     byte [di],bl
+        inc     di
+        inc     bl
+        mov     byte [di],bl
+        add     di,255
+        add     bl,7
+        mov     byte [di],bl
+        inc     di
+        inc     bl
+        mov     byte [di],bl
+        pop     ds
+%endmacro
+
 ; ---------- global variables ----------
 
 CGA_PALETTE             db 3            ; 0=MAGENTA 1=ORANGE, 2nd bit is intensity

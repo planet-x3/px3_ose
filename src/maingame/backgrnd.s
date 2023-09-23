@@ -290,10 +290,7 @@ AI_PROT_TANK_BULLDOZE:
 
         ; now get the tile
         .L20:
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
 
         ; now find the attributes of this tile
         mov     ah,0
@@ -317,10 +314,7 @@ AI_PROT_TANK_BULLDOZE:
 
         ; bulldoze tile
         .L31:
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],34            ; dirt
-        pop     ds
+        SET_MAP_BYTE    di,34           ; dirt
         ; create explosion AI unit
         mov     si,196                  ; start of projectile units
         .L40:
@@ -703,10 +697,7 @@ AI_CHECK_PYRAMID:
         ; Test for and Build the PYRAMID if it is not there.
         mov     di,ax
         mov     bx,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,0cch                 ; Is it A PYRAMID?
         je      .L15
         cmp     al,088h                 ; Is it a construction zone?
@@ -742,10 +733,7 @@ AI_CHECK_CLONE:
         sub     ah,3                    ; Locate 3 tiles north of pyramid
         mov     di,ax
         mov     bx,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,0b8h                 ; Is it clone facility?
         je      .L15
         cmp     al,088h                 ; Is it a construction zone?
@@ -781,10 +769,7 @@ AI_CHECK_ACADEMY:
         add     al,3                    ; Locate 3 tiles EAST of pyramid
         mov     di,ax
         mov     bx,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,0ceh                 ; Is it AN ACADEMY?
         je      .L15
         cmp     al,088h                 ; Is it a construction zone?
@@ -824,10 +809,7 @@ AI_CHECK_FACTORY:
         add     ah,3                    ; Locate 3 tiles SOUTH of pyramid
         mov     di,ax
         mov     bx,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,088h                 ; Is it a construction zone?
         je      .L15
         cmp     al,0bah                 ; Is it a FACTORY?
@@ -863,10 +845,7 @@ AI_CHECK_SOMEBUILD:
         sub     al,3                    ; Locate 3 tiles WEST of pyramid
         mov     di,ax
         mov     bx,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,0bch                 ; Is it A something else?
         je      .L15
         cmp     al,088h                 ; Is it a construction zone?
@@ -901,16 +880,8 @@ AI_PROT_CONST:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],088h
-        inc     di
-        mov     byte [di],089h
-        add     di,255
-        mov     byte [di],090h
-        inc     di
-        mov     byte [di],091h
-        pop     ds
+        mov     bl,088h
+        SET_MAP_BIG_BUILDING_DI_BL
         inc     byte UNIT_GEN_A[si]
         call    RANDOM_NUMBER_GENERATOR
         mov     UNIT_TIMER[si],al       ; set random start time
@@ -938,19 +909,7 @@ AI_PROT_CONST:
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
         ; draw new building to map
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],bl
-        inc     di
-        inc     bl
-        mov     byte [di],bl
-        add     di,255
-        add     bl,7
-        mov     byte [di],bl
-        inc     di
-        inc     bl
-        mov     byte [di],bl
-        pop     ds
+        SET_MAP_BIG_BUILDING_DI_BL
         call    CHECK_WINDOW_FOR_ACTION
         ret
 ; list of enemy building construction types
@@ -1007,10 +966,7 @@ SPAWN_WALKER1:
         mov     UNIT_TIMER[di],al
         ; plot to map
         mov     di,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],0a8h                  ; protoid tile
-        pop     ds
+        SET_MAP_BYTE    di,0a8h                 ; protoid tile
         call    CHECK_WINDOW_FOR_ACTION
         ret
 
@@ -1030,10 +986,7 @@ AI_PYRAMID_SENTRY_SCAN:
         add     ah,SENTRY_ORDER_Y[di]
         mov     si,ax
         mov     bx,ax                   ; Store for later
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; what tile is on the map currently?
-        pop     ds
+        GET_MAP_BYTE    si              ; what tile is on the map currently?
         mov     ah,0
         mov     si,ax
         mov     al,TILEATTRIB[si]       ; Grab attributes of that tile
@@ -1084,10 +1037,7 @@ AI_SENTRY_CONST:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],0dfh          ; sentry construction tile
-        pop     ds
+        SET_MAP_BYTE    di,0dfh         ; sentry construction tile
         mov     byte UNIT_GEN_A[si],1
         call    RANDOM_NUMBER_GENERATOR
         mov     UNIT_TIMER[si],al       ; set random start time
@@ -1097,11 +1047,7 @@ AI_SENTRY_CONST:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]            ; Get old tile
-        mov     byte [di],0afh          ; Sentry Pod tile
-        pop     ds
+        GET_SET_MAP_BYTE        di,0afh ; Get old tile, Sentry Pod tile
         mov     UNIT_TILE_UNDER[si],al
         mov     byte UNIT_GEN_A[si],0
         mov     byte UNIT_TIMER[si],1
@@ -1137,10 +1083,7 @@ AI_CONVERT_TO_SENTRY:
         mov     bl,UNIT_LOCATION_X[si]
         mov     di,bx
         mov     byte UNIT_WORKING[si],0
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         call    CHECK_WINDOW_FOR_ACTION
         .L2:
         mov     al,[SELECTED_UNIT]
@@ -1156,9 +1099,7 @@ AI_SENTRY_TANK:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
+        GET_MAP_BYTE    di
         cmp     al,094h                 ; make sure the tile is between 94h to 97h
         jae     .L01
         mov     al,094h                 ; set it to 094h if not.
@@ -1171,9 +1112,8 @@ AI_SENTRY_TANK:
         mov     ah,0
         mov     si,ax
         sub     si,94h
-        mov     al,byte [cs:SENTRY_SPIN+si]
-        mov     byte [di],al
-        pop     ds
+        mov     al,byte [SENTRY_SPIN+si]
+        SET_MAP_BYTE    di,al
         mov     si,[UNIT_SCAN]
         ; check if it is okay to fire again
         cmp     byte UNIT_GEN_A[si],0
@@ -1291,17 +1231,14 @@ AI_LARGE_EXPLOSION:
         mov     al,UNIT_GEN_B[si]
         mov     ah,0
         mov     si,ax
-        push    ds
-        mov     ds,[MAPSEG]
         mov     bx,0
         .L10:
-        mov     al,[cs:BIGEXPLOSION+si]
+        mov     al,[BIGEXPLOSION+si]
         cmp     al,0                    ; zero doesn't get drawn
         je      .L15
         ; check to see if map tile is indestructible or not
         ; ------
-        mov     cl,[di]
-        pop     ds
+        GET_MAP_BYTE_IN_CL      di
         push    si
         mov     ch,0
         mov     si,cx
@@ -1309,16 +1246,14 @@ AI_LARGE_EXPLOSION:
         mov     si,cx
         mov     ah,TILEATTRIB[si]
         pop     si
-        push    ds
-        mov     ds,[MAPSEG]
         and     ah,8
         cmp     ah,8                    ; can it be destroyed?
         je      .L13
-        mov     [di],cl
+        SET_MAP_BYTE    di,cl
         jmp     .L15
         .L13:
         ; ------
-        mov     [di],al
+        SET_MAP_BYTE    di,al
         .L15:
         inc     si
         inc     di
@@ -1330,7 +1265,6 @@ AI_LARGE_EXPLOSION:
         inc     bh
         cmp     bh,5
         jne     .L10
-        pop     ds
         mov     byte [REDRAW_SCREEN_REQ],1
         mov     cx,si
         mov     si,[UNIT_SCAN]
@@ -1700,10 +1634,7 @@ ATTACK_MAP:
         mov     bl,UNIT_LOCATION_X[si]
         mov     bh,UNIT_LOCATION_Y[si]
         mov     si,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get current map object
-        pop     ds
+        GET_MAP_BYTE    si              ; get current map object
         mov     ah,0
         mov     di,ax
         mov     al,TILEATTRIB[di]
@@ -1718,10 +1649,7 @@ ATTACK_MAP:
         ret
         .L55:
         mov     al,TILEDESTRUCT[di]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [si],al            ; place new map object
-        pop     ds
+        SET_MAP_BYTE    si,al           ; place new map object
         call    CHECK_WINDOW_FOR_ACTION_S
         cmp     byte [WINDOW_ACTION],1
         jne     .L56
@@ -1768,23 +1696,14 @@ ATTACK_UNIT:
         mov     byte [REDRAW_COMWIN_REQ],1
         .L74:
         mov     si,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get current map object
-        pop     ds
+        GET_MAP_BYTE    si              ; get current map object
         mov     ah,0
         mov     di,ax
         mov     al,TILEDESTRUCT[di]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [si],al            ; replace current map object
-        pop     ds
+        SET_MAP_BYTE    si,al           ; replace current map object
         ; now check tile to the right
         inc     si
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get current map object
-        pop     ds
+        GET_MAP_BYTE    si              ; get current map object
         mov     ah,0
         mov     di,ax
         mov     al,TILEATTRIB[di]
@@ -1792,17 +1711,11 @@ ATTACK_UNIT:
         cmp     al,64
         jne     .L75
         mov     al,TILEDESTRUCT[di]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [si],al            ; replace current map object
-        pop     ds
+        SET_MAP_BYTE    si,al           ; replace current map object
         .L75:
         ; now check tile below
         add     si,255
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get current map object
-        pop     ds
+        GET_MAP_BYTE    si              ; get current map object
         mov     ah,0
         mov     di,ax
         mov     al,TILEATTRIB[di]
@@ -1810,17 +1723,11 @@ ATTACK_UNIT:
         cmp     al,128
         jne     .L76
         mov     al,TILEDESTRUCT[di]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [si],al            ; replace current map object
-        pop     ds
+        SET_MAP_BYTE    si,al           ; replace current map object
         .L76:
         ; now check tile bottom-right
         inc     si
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get current map object
-        pop     ds
+        GET_MAP_BYTE    si              ; get current map object
         mov     ah,0
         mov     di,ax
         mov     al,TILEATTRIB[di]
@@ -1828,10 +1735,7 @@ ATTACK_UNIT:
         cmp     al,192
         jne     .L77
         mov     al,TILEDESTRUCT[di]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [si],al            ; replace current map object
-        pop     ds
+        SET_MAP_BYTE    si,al           ; replace current map object
         .L77:
         call    CHECK_WINDOW_FOR_ACTION_S
         cmp     byte [WINDOW_ACTION],1
@@ -1849,10 +1753,7 @@ ADJUST_PROJECTILE_FOR_WATER:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,18h                  ; water shallow
         je      .L5
         cmp     al,19h                  ; water shallow
@@ -1872,10 +1773,7 @@ ADJUST_EXPLOSION_FOR_WATER:
         mov     al,UNIT_LOCATION_X[si]
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,18h                  ; water shallow
         je      .L5
         cmp     al,19h                  ; water shallow
@@ -1894,10 +1792,7 @@ AI_BUILDER_BULLDOZE:
         mov     al,UNIT_DEST_X[si]
         mov     ah,UNIT_DEST_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],22h           ; dirt
-        pop     ds
+        SET_MAP_BYTE    di,22h          ; dirt
         call    CHECK_WINDOW_FOR_ACTION_S
         cmp     byte [WINDOW_ACTION],1
         jne     .L1
@@ -1921,10 +1816,7 @@ AI_BUILDER_DROPOFF:
         mov     di,ax
         mov     al,UNIT_GEN_C[si]
         mov     byte UNIT_GEN_C[si],0
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         call    CHECK_WINDOW_FOR_ACTION
         mov     al,[UNIT_SCAN]
         cmp     al,[SELECTED_UNIT]
@@ -1940,17 +1832,11 @@ AI_BUILDER_PICKUP:
         mov     al,UNIT_DEST_X[si]
         mov     ah,UNIT_DEST_Y[si]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
+        GET_SET_MAP_BYTE        di,22h  ; dirt
         cmp     al,2                    ; special case for plant
         jne     .not_a_plant
-        mov     byte [di],0
-        jmp     .was_a_plant
+        SET_MAP_BYTE    di,0
         .not_a_plant:
-        mov     byte [di],22h           ; dirt
-        .was_a_plant:
-        pop     ds
         mov     UNIT_GEN_C[si],al
         call    CHECK_WINDOW_FOR_ACTION
         mov     al,[UNIT_SCAN]
@@ -2008,10 +1894,7 @@ AI_SMELTER_REFINING:
 
 CHECK_FOR_MINERALS_AT_LOCATION:
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,07h                  ; high-density crystal
         je      .L5
         cmp     al,06h                  ; low-density crystal
@@ -2029,10 +1912,7 @@ CHECK_FOR_MINERALS_AT_LOCATION:
         ; If we made it this far, there's no minerals
         ret
         .L5:
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],22h           ; dirt
-        pop     ds
+        SET_MAP_BYTE    di,22h          ; dirt
         ret
 
 AI_SMELTER_SEARCHING:
@@ -2548,10 +2428,7 @@ CHECK_FOR_WATER_XY:
         ; water as a delivery location for boats.
         ; zf=1 if water is found, 0=no water
         mov     si,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     bl,byte [si]
-        pop     ds
+        GET_MAP_BYTE_IN_BL      si
         cmp     bl,18h                  ; water shallow
         je      .L1
         cmp     bl,19h                  ; water medium depth
@@ -2614,10 +2491,7 @@ GET_TILE_ATTRIB_XY:
         ; This routine grabs the attribute of the tile
         ; located at al for X, ah for Y ---> bl
         mov     si,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     bl,byte [si]
-        pop     ds
+        GET_MAP_BYTE_IN_BL      si
         mov     bh,0
         mov     si,bx
         mov     bl,TILEATTRIB[si]
@@ -2995,10 +2869,7 @@ AI_MOVEDOWN:
         mov     ah,UNIT_LOCATION_Y[si]
         inc     ah                      ; Check object to NORTH
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         ; check if this is a boat
         cmp     byte UNIT_TYPE[si],4    ; frigate
         jne     AIMDW12
@@ -3058,10 +2929,7 @@ AI_MOVEUP:
         mov     ah,UNIT_LOCATION_Y[si]
         dec     ah                      ; Check object to NORTH
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         ; check if this is a boat
         cmp     byte UNIT_TYPE[si],4    ; frigate
         jne     AIMUP12
@@ -3121,10 +2989,7 @@ AI_MOVERIGHT:
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
         inc     di                      ; Check object to right
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         ; check if this is a boat
         cmp     byte UNIT_TYPE[si],4    ; frigate
         jne     AIMRT12
@@ -3181,10 +3046,7 @@ AI_MOVELEFT:
         mov     ah,UNIT_LOCATION_Y[si]
         mov     di,ax
         dec     di                      ; Check object to LEFT
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         ; check if this is a boat
         cmp     byte UNIT_TYPE[si],4    ; frigate
         jne     AIMLF12

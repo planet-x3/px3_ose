@@ -372,71 +372,54 @@ RESET_GAME:
 ; description:
 ;       Create actual units for all unit tiles on the newly loaded map.
 SCAN_MAP_FOR_INITIAL_UNITS:
-        push    ds
-        mov     ds,[MAPSEG]
         mov     si,0
         .L1:
-        mov     al,byte [si]
+        GET_MAP_BYTE    si
         cmp     al,50h                  ; builder
         jne     .L2
-        pop     ds
         mov     ah,1                    ; type = builder
         mov     dl,20                   ; health = 20
         mov     bx,1                    ; under = <right>
         call    SCAN_MAP_CREATE_UNIT
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         .L2:
         cmp     al,51h                  ; builder
         jne     .L2a
-        pop     ds
         mov     ah,1                    ; type = builder
         mov     dl,20                   ; health = 20
         mov     bx,-1                   ; under = <left>
         call    SCAN_MAP_CREATE_UNIT
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         .L2a:
         cmp     al,58h                  ; tank
         jne     .L3
-        pop     ds
         mov     ah,2                    ; type = tank
         mov     dl,85                   ; health = 85
         mov     bx,1                    ; under = <right>
         call    SCAN_MAP_CREATE_UNIT
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         .L3:
         cmp     al,59h                  ; tank
         jne     .L3a
-        pop     ds
         mov     ah,2                    ; type = tank
         mov     dl,85                   ; health = 85
         mov     bx,-1                   ; under = <left>
         call    SCAN_MAP_CREATE_UNIT
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         .L3a:
         cmp     al,07ch                 ; headquarters
         jne     .L4
-        pop     ds
         call    SCAN_MAP_CREATE_HQ
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         .L4:
         cmp     al,0cch                 ; pyramid base
         jne     .L20
-        cmp     byte [si+1],0cdh        ; hack for mirrored "2nd strike": no broken pyramids
+        inc     si
+        GET_MAP_BYTE    si
+        dec     si
+        cmp     al,0cdh                 ; hack for mirrored "2nd strike": no broken pyramids
         jne     .L20
-        pop     ds
         call    SCAN_MAP_CREATE_PYRAMID
-        push    ds
-        mov     ds,[MAPSEG]
         jmp     .L20
         ; put more searches here....
         .L20:
@@ -445,7 +428,6 @@ SCAN_MAP_FOR_INITIAL_UNITS:
         je      .L21                    ; too long for short jump
         jmp     .L1
         .L21:
-        pop     ds
         mov     byte [UNIT_COUNT_TIMER],1
         call    UNIT_COUNT
         ret
@@ -474,88 +456,11 @@ SCAN_MAP_CREATE_UNIT:
         mov     UNIT_LOCATION_X[di],al
         mov     UNIT_LOCATION_Y[di],ah
         ; find tile to right, use as under-tile
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si+bx]         ; get tile to the right, left, top or bottom
-        pop     ds
+        add     si,bx                           ; get tile to the right, left, top or bottom
+        GET_MAP_BYTE    si
         mov     UNIT_TILE_UNDER[di],al
         .L3:
         ret
-
-; SCAN_MAP_CREATE_SOLDIER:
-        ; mov     di,0
-        ; .L1:
-        ; cmp     byte UNIT_TYPE[di],0
-        ; je      .L2
-        ; inc     di
-        ; cmp     di,20
-        ; je      .L3
-        ; jmp     .L1
-        ; .L2:
-        ; mov     byte UNIT_TYPE[di],8         ; soldier
-        ; mov     byte UNIT_TILE[di],52h       ; soldier tile
-        ; mov     byte UNIT_HEALTH[di],5
-        ; mov     ax,si
-        ; mov     UNIT_LOCATION_X[di],al
-        ; mov     UNIT_LOCATION_Y[di],ah
-        ; ; find tile to right, use as under-tile
-        ; push    ds
-        ; mov     ds,[MAPSEG]
-        ; mov     al,byte [1+si]   ; get tile to the right
-        ; pop     ds
-        ; mov     UNIT_TILE_UNDER[di],al
-        ; .L3:
-        ; ret
-
-; SCAN_MAP_CREATE_SCOUT:
-        ; mov     di,0
-        ; .L1:
-        ; cmp     byte UNIT_TYPE[di],0
-        ; je      .L2
-        ; inc     di
-        ; cmp     di,20
-        ; je      .L3
-        ; jmp     .L1
-        ; .L2:
-        ; mov     byte UNIT_TYPE[di],9         ; scout
-        ; mov     byte UNIT_TILE[di],54h       ; scout tile
-        ; mov     byte UNIT_HEALTH[di],20
-        ; mov     ax,si
-        ; mov     UNIT_LOCATION_X[di],al
-        ; mov     UNIT_LOCATION_Y[di],ah
-        ; ; find tile to right, use as under-tile
-        ; push    ds
-        ; mov     ds,[MAPSEG]
-        ; mov     al,byte [1+si]   ; get tile to the right
-        ; pop     ds
-        ; mov     UNIT_TILE_UNDER[di],al
-        ; .L3:
-        ; ret
-
-; SCAN_MAP_CREATE_FIGHTER:
-        ; mov     di,0
-        ; .L1:
-        ; cmp     byte UNIT_TYPE[di],0
-        ; je      .L2
-        ; inc     di
-        ; cmp     di,20
-        ; je      .L3
-        ; jmp     .L1
-        ; .L2:
-        ; mov     byte UNIT_TYPE[di],10        ; fighter
-        ; mov     byte UNIT_TILE[di],5ah       ; fighter tile
-        ; mov     byte UNIT_HEALTH[di],40
-        ; mov     ax,si
-        ; mov     UNIT_LOCATION_X[di],al
-        ; mov     UNIT_LOCATION_Y[di],ah
-        ; ; find tile to right, use as under-tile
-        ; push    ds
-        ; mov     ds,[MAPSEG]
-        ; mov     al,byte [1+si]   ; get tile to the right
-        ; pop     ds
-        ; mov     UNIT_TILE_UNDER[di],al
-        ; .L3:
-        ; ret
 
 SCAN_MAP_CREATE_HQ:
         mov     di,20
@@ -644,10 +549,7 @@ BROWSE_GET_TILE:
         mov     bl,[BROWSE_CURSOR_X]
         add     bl,[MAP_OFFS_X]
         mov     si,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]
-        pop     ds
+        GET_MAP_BYTE    si
         mov     [SELECTED_TILE],al
         ret
 
@@ -2074,10 +1976,7 @@ ADJUST_CO_FOR_BUILDING:
         mov     al,[CHECK_X]
         mov     ah,[CHECK_Y]
         mov     si,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [si]            ; get tile
-        pop     ds
+        GET_MAP_BYTE    si              ; get tile
         mov     ah,0
         mov     si,ax
         mov     al,TILEATTRIB[si]       ; get attributes of tile
@@ -2281,10 +2180,7 @@ ERASE_UNIT_FROM_MAP:
         mov     bl,UNIT_LOCATION_X[si]
         mov     di,bx
         mov     al,UNIT_TILE_UNDER[si]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         ret
 
 PLOT_UNIT_ON_MAP:
@@ -2301,26 +2197,17 @@ PLOT_UNIT_ON_MAP:
         mov     bh,UNIT_LOCATION_Y[si]
         mov     bl,UNIT_LOCATION_X[si]
         mov     di,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         mov     UNIT_TILE_UNDER[si],al
         mov     al,UNIT_TILE[si]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         ret
         .L7:
         ; possible swimmer
         mov     bh,UNIT_LOCATION_Y[si]
         mov     bl,UNIT_LOCATION_X[si]
         mov     di,bx
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,24                   ; water
         je      .L9
         cmp     al,25                   ; water
@@ -2339,10 +2226,7 @@ PLOT_UNIT_ON_MAP:
         mov     UNIT_TILE_UNDER[si],al
         mov     al,UNIT_TILE[si]
         .L11:
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         ret
 
 RANDOM_NUMBER_GENERATOR:

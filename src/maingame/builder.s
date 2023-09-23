@@ -290,10 +290,7 @@ place_tile_on_water:
         call    TEST_FOR_WATER
         pop     ax
         jne     .end
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [di],al
-        pop     ds
+        SET_MAP_BYTE    di,al
         .end:
         ret
 
@@ -351,10 +348,7 @@ AI_BUILD_BRIDGE_FIND_DIRECTION:
 ; returns:
 ;       zf: 1 if water, otherwise 0
 TEST_FOR_WATER:
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,18h                          ; shallow water
         je      .end
         cmp     al,19h                          ; water medium
@@ -872,10 +866,7 @@ CHECK_BUILD_LOCATION:
         mov     ah,[MAP_OFFS_Y]
         add     ah,[BROWSE_CURSOR_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte 0[di]           ; first tile
-        pop     ds
+        GET_MAP_BYTE    di              ; first tile
         mov     ah,0
         mov     di,ax
         mov     cl,TILEATTRIB[di]
@@ -889,10 +880,9 @@ CHECK_BUILD_LOCATION:
         mov     ah,[MAP_OFFS_Y]
         add     ah,[BROWSE_CURSOR_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte 1[di]           ; second tile
-        pop     ds
+        inc     di
+        GET_MAP_BYTE    di              ; second tile
+        dec     di
         mov     ah,0
         mov     di,ax
         mov     cl,TILEATTRIB[di]
@@ -906,10 +896,9 @@ CHECK_BUILD_LOCATION:
         mov     ah,[MAP_OFFS_Y]
         add     ah,[BROWSE_CURSOR_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte 256[di]         ; third tile
-        pop     ds
+        add     di,256
+        GET_MAP_BYTE    di              ; third tile
+        sub     di,256
         mov     ah,0
         mov     di,ax
         mov     cl,TILEATTRIB[di]
@@ -923,10 +912,9 @@ CHECK_BUILD_LOCATION:
         mov     ah,[MAP_OFFS_Y]
         add     ah,[BROWSE_CURSOR_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte 257[di]         ; forth tile
-        pop     ds
+        add     di,257
+        GET_MAP_BYTE    di              ; fourth tile
+        sub     di,257
         mov     ah,0
         mov     di,ax
         mov     cl,TILEATTRIB[di]
@@ -1038,10 +1026,7 @@ BUILD_GAS_REFINERY:
         mov     ah,[MAP_OFFS_Y]
         add     ah,[BROWSE_CURSOR_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        pop     ds
+        GET_MAP_BYTE    di
         cmp     al,024h                         ; top-left of gas vent
         je      .L1
         mov     byte UNIT_GEN_A[si],0
@@ -1214,10 +1199,7 @@ BUILDER_DROP_OFF_ITEM:
         mov     ah,[BROWSE_CURSOR_Y]
         add     ah,[MAP_OFFS_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     [di],bl
-        pop     ds
+        SET_MAP_BYTE    di,bl
         call    DRAW_ENTIRE_SCREEN
         call    DRAW_STATUS_WINDOW
         call    DRAW_COMMAND_WINDOW
@@ -1320,17 +1302,11 @@ BUILDER_PICK_UP_ITEM:
         mov     ah,[BROWSE_CURSOR_Y]
         add     ah,[MAP_OFFS_Y]
         mov     di,ax
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [di]
-        cmp     al,2                            ; special case for plant
+        GET_SET_MAP_BYTE        di,22h  ; dirt
+        cmp     al,2                    ; special case for plant
         jne     .not_a_plant
-        mov     byte [di],0
-        jmp     .was_a_plant
+        SET_MAP_BYTE    di,0
         .not_a_plant:
-        mov     byte [di],22h                   ; dirt
-        .was_a_plant:
-        pop     ds
         call    DRAW_ENTIRE_SCREEN
         call    DRAW_COMMAND_WINDOW
         call    DRAW_STATUS_WINDOW

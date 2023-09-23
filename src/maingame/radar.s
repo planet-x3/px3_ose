@@ -77,8 +77,6 @@ generic_scan:
         call    WRITE_TEXT
 
         mov     di,[cs:radar_map_pos]
-        push    ds
-        mov     ds,[MAPSEG]
         xor     si,si
 .yloop:
         push    di
@@ -90,7 +88,8 @@ generic_scan:
         mov     ah,[cs:radar_mask]
         mov     cl,8
 .loop8pix:
-        lodsb
+        GET_MAP_BYTE    si
+        inc     si
         cs xlatb
         and     al,ah                   ; radar bit mask in ah
         add     al,0ffh                 ; overflows if al!=0
@@ -104,7 +103,6 @@ generic_scan:
         add     di,256                  ; increment y-coordinate
         or      si,si
         jns     .yloop
-        pop     ds
         call    RADAR_PLOT_SELF
         call    RADAR_WAIT_FOR_KEY
         ret

@@ -121,20 +121,14 @@ draw_entire_screen_without_transparency:
         mov     si,ax
         mov     [TEMP_MAP_LOC],ax
         call    find_screen_location
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
+        GET_MAP_BYTE    si
         mov     [TEMP_A],al
         call    plot_tile_lazy
         inc     byte [CURSOR_X]
         .DES02: ; and now we just adjust as we draw across the screen.
         inc     word [TEMP_MAP_LOC]
         mov     si,[TEMP_MAP_LOC]
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
+        GET_MAP_BYTE    si
         mov     [TEMP_A],al
         call    plot_tile_lazy
         inc     byte [CURSOR_X]
@@ -284,10 +278,7 @@ DRAW_FLYING_OBJECTS:
 find_cursor_location:
         mov     si,[BROWSE_CURSOR_X]    ; loads both, x and y
         add     si,[MAP_OFFS_X]         ; loads and adds both, x and y
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
+        GET_MAP_BYTE    si
         mov     byte [TEMP_A],al
         mov     ax,[BROWSE_CURSOR_X]    ; loads both, x and y
         tcall   find_screen_location.skip_load_ax
@@ -326,10 +317,7 @@ plot_tile_XY_on_bg:
         ; find correct tile
         mov     si,[CURSOR_X]           ; loads both, x and y
         add     si,[MAP_OFFS_X]         ; loads and adds both, x and y
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,[si]
-        pop     ds
+        GET_MAP_BYTE    si
         mov     byte [TEMP_A],al
         call    find_screen_location
 plot_tile_on_bg:
