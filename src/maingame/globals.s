@@ -36,42 +36,77 @@ DIAGS   equ     0       ; Used for showing diagnostic screen if F1 pressed
 %endmacro
 
 %macro GET_MAP_BYTE 1
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [%1]
-        pop     ds
+        push    si
+        mov     si,%1
+        call    get_map_byte
+        pop     si
 %endmacro
 
 %macro GET_MAP_BYTE_IN_BL 1
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     bl,byte [%1]
-        pop     ds
+        push    si
+        mov     si,%1
+        push    ax
+        call    get_map_byte
+        mov     bl,al
+        pop     ax
+        pop     si
 %endmacro
 
 %macro GET_MAP_BYTE_IN_CL 1
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     cl,byte [%1]
-        pop     ds
+        push    si
+        mov     si,%1
+        push    ax
+        call    get_map_byte
+        mov     cl,al
+        pop     ax
+        pop     si
 %endmacro
 
 %macro SET_MAP_BYTE 2
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     byte [%1],%2
-        pop     ds
+        push    di
+        mov     di,%1
+        push    ax
+        mov     al,%2
+        call    set_map_byte
+        pop     ax
+        pop     di
 %endmacro
 
 %macro GET_SET_MAP_BYTE 2
-        push    ds
-        mov     ds,[MAPSEG]
-        mov     al,byte [%1]
-        mov     byte [%1],%2
-        pop     ds
+        ; ignore %1 -- always di
+        push    bx
+        mov     bl,%2
+        call    get_set_map_byte
+        pop     bx
 %endmacro
 
 %macro SET_MAP_BIG_BUILDING_DI_BL 0
+        call    set_map_big_building
+%endmacro
+
+get_map_byte:
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     al,byte [si]
+        pop     ds
+        ret
+
+set_map_byte:
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     byte [di],al
+        pop     ds
+        ret
+
+get_set_map_byte:
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     al,byte [di]
+        mov     byte [di],bl
+        pop     ds
+        ret
+
+set_map_big_building:
         push    ds
         mov     ds,[MAPSEG]
         mov     byte [di],bl
@@ -85,7 +120,7 @@ DIAGS   equ     0       ; Used for showing diagnostic screen if F1 pressed
         inc     bl
         mov     byte [di],bl
         pop     ds
-%endmacro
+        ret
 
 ; ---------- global variables ----------
 
