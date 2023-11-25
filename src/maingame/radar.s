@@ -285,6 +285,7 @@ radar_lut:
         db      0
         db      2       ; 6fh - brick walL
         times   76h-70h         db      8
+        times   78h-76h         db      0
         times   98h-78h         db      8
         times   0a8h-98h        db      0
         times   0b4h-0a8h       db      8
