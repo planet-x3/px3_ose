@@ -28,6 +28,14 @@ CLEAR_MENU_WINDOW:
         mov     di,[rect_menu]
         mov     cx,68
         mov     bx,56
+        ; special case: widen for low-res EGA and modified text mode
+        cmp     word [set_video_mode],set_video_mode_ega_low
+        je      .do_adj
+        cmp     word [set_video_mode],set_video_mode_text
+        jne     .skip_adj
+        .do_adj:
+        add     cx,4
+        .skip_adj:
         jmp     [clear_rect]
 
 GAME_MENU:
