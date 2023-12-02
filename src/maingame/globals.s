@@ -155,7 +155,7 @@ VIDEOMENU               db "aq",10,"Choose Video Mode: (/v)",13,10
                         db "h-Plantronics     320x200 / 16-color    (doubled pixels)",13,10
                         db "i-Tandy           320x200 / 16-color",13,10
                         db "j-Plantronics     320x200 / 16-color",13,10
-                        db "k-EGA (64k)       320x200 / 16-color    (reserved, not implemented)",13,10
+                        db "k-EGA (64k)       320x200 / 16-color    (accelerated)",13,10
                         db "l-VGA (MCGA)      320x200 / 256-color",13,10
                         db "m-VGA (mode Y)    320x200 / 256-color   (accelerated)",13,10
                         db "n-Tandy (ETGA)    640x200 / 16-color",13,10
