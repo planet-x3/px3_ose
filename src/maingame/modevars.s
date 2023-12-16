@@ -1410,6 +1410,54 @@ music_mode_vars_lptsid:
 
 ;----------------------------------------
 
+align   2
+music_mode_vars_mmb:
+.ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
+.ssy_mus_data_size      dw      32768
+.ssy_base_port          dw      300h
+.ssy_wr                 dw      dummy_func ; mmb_out_c0_emu
+.ssy_device_init_func   dw      dummy_func ; mmb_init
+.ssy_device_shut        dw      ssy_tandy_shut
+.ssy_device_isr         dw      dummy_func
+.ssy_init_in_menu       dw      dummy_func
+.ssy_uses_lpt           db      0
+.ssy_default_music_on   db      1
+.ssy_file_name_marker   db      'T'
+
+;----------------------------------------
+
+align   2
+music_mode_vars_aylpt:
+.ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
+.ssy_mus_data_size      dw      32768
+.ssy_base_port          dw      0
+.ssy_wr                 dw      aylpt_out_c0_emu
+.ssy_device_init_func   dw      aylpt_init
+.ssy_device_shut        dw      ssy_tandy_shut
+.ssy_device_isr         dw      dummy_func
+.ssy_init_in_menu       dw      dummy_func
+.ssy_uses_lpt           db      1
+.ssy_default_music_on   db      1
+.ssy_file_name_marker   db      'T'
+
+;----------------------------------------
+
+align   2
+music_mode_vars_csm:
+.ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
+.ssy_mus_data_size      dw      32768
+.ssy_base_port          dw      220h
+.ssy_wr                 dw      dummy_func ; csm_out_c0_emu
+.ssy_device_init_func   dw      dummy_func ; csm_init
+.ssy_device_shut        dw      ssy_tandy_shut
+.ssy_device_isr         dw      dummy_func
+.ssy_init_in_menu       dw      dummy_func
+.ssy_uses_lpt           db      0
+.ssy_default_music_on   db      1
+.ssy_file_name_marker   db      'T'
+
+;----------------------------------------
+
 ; description:
 ;       Copy block of mode-specific variables to music_mode_vars.
 ; parameters:

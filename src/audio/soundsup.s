@@ -30,7 +30,7 @@
 
 SSY_SEG                 dw      0
 
-SOUNDMENU               db      "al"
+SOUNDMENU               db      "ao"
                         db      10,"Choose audio device for music: (/a)",13,10
                         db      "-----------------------------------",13,10
                         db      "a-None",13,10
@@ -45,10 +45,10 @@ SOUNDMENU               db      "al"
                         db      "j-CMSLPT",13,10
                         db      "k-Innovation SSI-2001",13,10
                         db      "l-LPTSID/ParaSID                        (WIP)",13,10
+                        db      "m-Mindscape Music Board (Mockingboard)  (reserved, not implemented)",13,10
+                        db      "n-AY-LPT (BC1 on 17, BDIR on 1)         (WIP)",13,10
+                        db      "o-Covox Sound Master                    (reserved, not implemented)",13,10
                         db      "$"
-                        ; NOTE: The following letters are tentatively reserved for:
-                        ;       m-Mindscape Music Board (Mockingboard)
-                        ;       n-AY-LPT
 
 
 LPTMENU                 db      "13"
@@ -147,6 +147,7 @@ ask_sound:
         mov     bl,al
         sub     bx,'a'
         cmp     bx,12                   ; highest sound device number
+        cmp     bx,15                   ; highest sound device number
         jnb     ask_sound
         shl     bx,1
         mov     si,[.block_addr_lut+bx]
@@ -177,6 +178,9 @@ ask_sound:
                 dw      music_mode_vars_cmslpt
                 dw      music_mode_vars_ssi2001
                 dw      music_mode_vars_lptsid
+                dw      music_mode_vars_mmb
+                dw      music_mode_vars_aylpt
+                dw      music_mode_vars_csm
 
 LPTsetup:
         mov     si,LPTMENU
