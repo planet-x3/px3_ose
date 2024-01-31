@@ -88,17 +88,17 @@ truncate -c -s 32768 "${DEST}/map13.map"
 
 # Convert MIDIs
 
-# Roland SC-55
+# Roland SC-55 (incomplete, filled up with converted MT-32 tracks)
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/08 No More Fighting (GM).mid" "${DEST}/g_lose.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/06 Into Battle (GM).mid" "${DEST}/g_menu.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/01 Fight for the Future (GM).mid" "${DEST}/g_mus01.bin" 5
-${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland MT-32/MIDIFILES/PX3 02 Apprehension (MT-32).mid" "${DEST}/g_mus02.bin" 5 # stolen from MT-32
+${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland MT-32/MIDIFILES/PX3 02 Apprehension (MT-32).mid" "${DEST}/g_mus02.bin" 5 MT-32
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/04 Plan Ahead (GM).mid" "${DEST}/g_mus03.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/02 Jungle Vibes (GM).mid" "${DEST}/g_mus04.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/03 Klepackin' Heat (GM).mid" "${DEST}/g_mus05.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/05 New Lands (GM).mid" "${DEST}/g_mus06.bin" 5
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/09 The X2 Anthem (GM).mid" "${DEST}/g_mus07.bin" 5
-${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland SC-55/MIDIFILES/07 Let the Soldiers Rest (GM).mid" "${DEST}/g_win.bin" 5 # dubious
+${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland MT-32/MIDIFILES/PX3 07 Valiant fighters (MT-32).mid" "${DEST}/g_win.bin" 5 MT-32
 
 # Roland MT-32 (with extra tracks)
 ${CONV_MIDI} "${PX3_DDL}/Soundtrack/Roland MT-32/MIDIFILES/PX3 99  MT-32 SYS EX.mid" "${DEST}/m_init.bin" 6
