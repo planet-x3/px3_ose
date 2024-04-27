@@ -1399,8 +1399,8 @@ music_mode_vars_lptsid:
 .ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
 .ssy_mus_data_size      dw      32768
 .ssy_base_port          dw      0
-.ssy_wr                 dw      dummy_func
-.ssy_device_init_func   dw      dummy_func
+.ssy_wr                 dw      lptsid_out_c0_emu
+.ssy_device_init_func   dw      lptsid_init
 .ssy_device_shut        dw      ssy_tandy_shut
 .ssy_device_isr         dw      dummy_func
 .ssy_init_in_menu       dw      dummy_func

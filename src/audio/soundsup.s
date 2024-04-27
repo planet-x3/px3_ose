@@ -44,10 +44,10 @@ SOUNDMENU               db      "al"
                         db      "i-CMS/GameBlaster",13,10
                         db      "j-CMSLPT",13,10
                         db      "k-Innovation SSI-2001",13,10
-                        db      "l-LPTSID",13,10
+                        db      "l-LPTSID/ParaSID                        (WIP)",13,10
                         db      "$"
                         ; NOTE: The following letters are tentatively reserved for:
-                        ;       m-Mockingboard
+                        ;       m-Mindscape Music Board (Mockingboard)
                         ;       n-AY-LPT
 
 

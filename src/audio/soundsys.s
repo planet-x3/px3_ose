@@ -922,6 +922,7 @@ ssy_tndlpt_write:
 %include "tnd_cmslpt.s"
 
 %include "tnd_ssi.s"
+%include "tnd_lptsid.s"
 
 
 ;------------------------------------------------------------------------------
