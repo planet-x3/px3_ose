@@ -662,6 +662,103 @@ plot_string_color_pc1512:
         ret
 
 ; description:
+;       String plotting routine for Sigma Designs Color 400.
+; parameters:
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color400:
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        call    plot_string_cga
+        pop     cx,di,si
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        call    plot_string_cga
+        pop     cx,di,si
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        call    plot_string_cga
+        pop     cx,di,si
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        call    plot_string_cga
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        ret
+
+; description:
+;       String plotting routine for Sigma Designs Color 400 (color).
+; parameters:
+;       font_bg_color: background color in mode-specific format
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color_color400:
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        test    word [font_bg_color],1
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .blue
+        inc     word [font_bg_color]
+        .blue:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        test    word [font_bg_color],2
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .green
+        inc     word [font_bg_color]
+        .green:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        push    si,di,cx
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        test    word [font_bg_color],4
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .red
+        inc     word [font_bg_color]
+        .red:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        test    word [font_bg_color],8
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .intensity
+        inc     word [font_bg_color]
+        .intensity:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        ret
+
+; description:
 ;       String plotting routine for VGA mode-Y.
 ; parameters:
 ;       font_bg_color: foreground/background color in mode-specific format

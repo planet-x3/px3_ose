@@ -215,7 +215,7 @@ ask_video:
         mov     bh,0
         mov     bl,al
         sub     bx,'a'
-        cmp     bx,18                   ; highest mode number
+        cmp     bx,19                   ; highest mode number
         jnb     ask_video
         shl     bx,1
         mov     si,[.block_addr_lut+bx]
@@ -239,6 +239,7 @@ ask_video:
                 dw      mode_vars_atigs
                 dw      mode_vars_pc1512
                 dw      mode_vars_quadcolor2
+                dw      mode_vars_color400
 
 %include "setmode.s"                    ; video mode initialization
 %include "convert.s"                    ; conversion functions for tile graphics and fade-in

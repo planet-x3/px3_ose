@@ -200,6 +200,96 @@ scroll_up_pc1512:
         ret
 
 ; description:
+;       Scrolls the contents of a rectangle up by one text line (= six logical pixels).
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen, excluding the last text line
+scroll_up_color400:
+        push    di,cx,bx
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        call    scroll_up_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        call    scroll_up_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        call    scroll_up_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        tcall   scroll_up_cga
+
+; description:
+;       Clears a rectangle on screen (nominally black) on Sigma Designs Color 400.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_color400:
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        tcall   clear_rect_cga
+
+; description:
+;       Clears a rectangle on screen (nominally white) on Sigma Designs Color 400.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_white_color400:
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        push    di,cx,bx
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        tcall   clear_rect_white_cga
+
+; description:
 ;       Calculate offset in video memory from coordinates on a logical 160x200 screen.
 ; parameters:
 ;       di: logical coordinates (Y in upper byte, X in lower byte)

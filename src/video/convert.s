@@ -451,6 +451,47 @@ fadein_pixel_xfer_pc1512:
         ret
 
 ; description:
+;       Copy a group of pixels to Sigma Designs Color 400 VRAM in a way that
+;       mimics what other video modes do using "movsb" or an emulation.
+fadein_pixel_xfer_color400:
+        push    ax,dx,si
+
+        mov     ax,si
+        cmp     ax,2000h
+        cmc
+        rcr     si,1
+        and     ax,0dfffh
+        mov     dh,80
+        div     dh
+        mov     dl,ah
+        shl     si,1
+        rcl     al,1
+        mul     dh
+        mov     dh,0
+        add     ax,dx
+        mov     si,ax
+
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        shl     si,2
+        lodsb
+        mov     [es:di],al
+        mov     al,1
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     al,2
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     al,3
+        out     dx,al
+        movsb
+        pop     si,dx,ax
+        ret
+
+; description:
 ;       Copy a group of pixels to EGA VRAM in a way that mimics what
 ;       other video modes do using "movsb" or an emulation.
 fadein_pixel_xfer_ega:

@@ -512,6 +512,22 @@ set_video_mode_pc1512:
         tcall   video_error
 
 ; description:
+;       Sets the Sigma Designs Color 400's 640x200 16-color mode.
+set_video_mode_color400:
+        call    set_video_mode_cg2
+        ; implicitly restore the palette register for color 4 to 4
+        mov     ah,0bh
+        mov     bx,4
+        int     10h
+        ; housekeeping
+        call    gen_gray_luts_if_needed
+        call    prepare_color_vars_ega
+        ; adjust memory layout
+        mov     ax,[SCRATCHSEG]
+        mov     [TILELOADSEG],ax
+        ret
+
+; description:
 ;       Tries to detect the type of video hardware in a safe manner.
 ; variables:
 ;       video_hw [out]

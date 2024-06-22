@@ -407,6 +407,34 @@ plot_tile:                                      ; used for plotting tile elsewhe
         ret
 
 ; description:
+;       Internal tile plotting routine for Sigma Designs Color 400.
+; parameters:
+;       si: tile bitmap
+;       di: destination offset in video memory
+; returns:
+;       di: next destination offset in video memory
+i_plot_tile_color400:
+        mov     dx,2deh
+        mov     al,0
+        out     dx,al
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     dx,2deh
+        mov     al,1
+        out     dx,al
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     dx,2deh
+        mov     al,2
+        out     dx,al
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     dx,2deh
+        mov     al,3
+        out     dx,al
+        tcall   i_plot_tile_cga
+
+; description:
 ;       Internal tile plotting routine for Amstrad PC1512 VDU.
 ; parameters:
 ;       si: tile bitmap
