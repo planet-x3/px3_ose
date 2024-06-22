@@ -948,6 +948,60 @@ mode_vars_pc1512:
 
 ;----------------------------------------
 
+align   2
+mode_vars_quadcolor2:
+
+.video_hw_needed        dw      VIDEO_HW_CGA_LIKE       ; just simple CGA detection for now
+.VIDEO_SEG              dw      0d000h  ; Segment for video output
+
+; colors for GUI elements
+.font_bg_black          dw      0
+.font_bg_norm           dw      1
+.font_bg_norm_bright    dw      9
+.font_bg_alt            dw      4
+.font_bg_alt_bright     dw      12
+.font_bg_frame          dw      8
+.radar_color_hydro      dw      1
+.radar_color_thermal    dw      12
+.radar_color_osc        dw      8
+.radar_color_metal      dw      14
+.radar_color_marker     dw      15
+.radar_color_frame      dw      15
+
+.stride_tile            dw      16
+.framebuf_size          dw      64000
+.font_size              dw      305
+.tileset_size           dw      65535   ; we cannot get closer to 64 KiB
+.tileseg_paragraphs     dw      1000h
+.tile_offset_shift_val  dw      0
+.tile_row_offset        dw      5120
+
+.fadestep_chunks        dw      (10000h / FADESTEPS)    ; FADESTEP chunks totaling VGA RAM size
+.lfsr_tap_bits          dw      1101000000001000B       ; optimal 2^16 tap bits are 16,15,13,4
+
+.file_exts              db      "VGAVGAVGAVGA"
+
+.plot_cursor            dw      plot_cursor_etga
+.plot_cursor_big        dw      plot_cursor_big_etga
+.i_plot_tile            dw      i_plot_tile_vga
+.plot_string            dw      plot_string_vga
+.plot_string_color      dw      plot_string_color_vga
+.plot8pix               dw      plot8pix_mcga
+.scroll_up              dw      scroll_up_vga
+.clear_rect             dw      clear_rect_vga
+.clear_rect_white       dw      clear_rect_white_vga
+.calc_screen_offset     dw      calc_screen_offset_vga
+.mode_specific_entry    dw      TOGGLE_TRANS
+.mode_specific_string   dw      menu_string_transparency_on
+.set_video_mode         dw      set_video_mode_quadcolor2
+.restore_old_mode       dw      restore_old_mode_quadcolor2
+
+.converting_sys_to_vid_movsb    dw      converting_sys_to_vid_movsb_etga
+.convert_tiles          dw      convert_tiles_etga
+.convert_screen         dw      dummy_func
+
+;----------------------------------------
+
 ; description:
 ;       Copy block of mode-specific variables to mode_vars.
 ; parameters:

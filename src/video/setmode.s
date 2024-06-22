@@ -297,6 +297,7 @@ set_video_mode_text:
 ;       Sets the 640x200x16 mode of the Enhanced Tandy Graphics Adapter.
 set_video_mode_etga:
         call    set_etga_640x200x16
+        .common:
         call    gen_gray_luts_if_needed
         call    prepare_color_vars_etga
         cmp     byte [cmd_arg_o],'4'
@@ -304,6 +305,16 @@ set_video_mode_etga:
         mov     byte [VGA_TO_ETGA_LUT+14],14
         .do_not_restore_transparency_color:
         ret
+
+; description:
+;       Sets the 640x200x16 mode of the Quadram Quadcolor II.
+set_video_mode_quadcolor2:
+        mov     ax,0006h                ; 640x200 mode
+        int     10h
+        mov     dx,3deh                 ; Quadcolor II control register
+        mov     al,10h                  ; enable output from Quadcolor II
+        out     dx,al
+        tcall   set_video_mode_etga.common
 
 ; description:
 ;       Sets the ordinary 256-color VGA (MCGA) mode.
@@ -627,6 +638,17 @@ restore_old_mode_plantronics:
 ;       Restore the old video mode, disabling ETGA mode.
 restore_old_mode_etga:
         call    exit_etga_640x200x16
+        mov     ah,0                    ; subfunction 0 sets video mode
+        mov     al,[cs:old_mode]        ; mode saved at program start
+        int     10h
+        ret
+
+; description:
+;       Restore the old video mode, disabling ETGA mode.
+restore_old_mode_quadcolor2:
+        mov     dx,3deh                 ; Quadcolor II control register
+        mov     al,0                    ; disable output from Quadcolor II
+        out     dx,al
         mov     ah,0                    ; subfunction 0 sets video mode
         mov     al,[cs:old_mode]        ; mode saved at program start
         int     10h
