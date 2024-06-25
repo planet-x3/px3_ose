@@ -316,6 +316,28 @@ plot_string_reverse_hercules:
         ret
 
 ; description:
+;       String plotting routine for Hercules InColor (color).
+; parameters:
+;       font_bg_color: background color in mode-specific format
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color_incolor:
+        mov     dx,3b4h
+        mov     al,1ah
+        out     dx,al
+        inc     dx
+        mov     al,[font_bg_color]
+        shl     al,4
+        or      al,0fh
+        out     dx,al
+        call    plot_string_hercules
+        mov     dx,3b5h
+        mov     al,0fh
+        out     dx,al
+        ret
+
+; description:
 ;       String plotting routine for 2-color CGA (color).
 ; parameters:
 ;       font_bg_color: background color in mode-specific format

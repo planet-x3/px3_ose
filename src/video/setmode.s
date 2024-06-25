@@ -412,6 +412,27 @@ set_video_mode_atigs:
         tcall   convert_vga_font_for_mtdy_and_atigs
 
 ; description:
+;       Sets the 640x300x16 Hercules InColor mode.
+set_video_mode_incolor:
+        ; set Hercules mode (640x300x2) and modify it
+        call    set_hercules_640x300x2
+        mov     dx,3bfh
+        mov     al,3                    ; also enable RAM at B800h
+        out     dx,al
+        call    gen_gray_luts_if_needed
+        call    prepare_color_vars_ega
+        ; adjust memory layout
+        mov     ax,[SCRATCHSEG]
+        mov     [TILELOADSEG],ax
+        mov     word [TILESEG],0b800h
+        ; shift coordinate display to the next even line
+        add     word [numpos_xcoord],100h
+        and     word [numpos_xcoord],0feffh
+        add     word [numpos_ycoord],100h
+        and     word [numpos_ycoord],0feffh
+        ret
+
+; description:
 ;       Sets the 640x200x16 EGA mode.
 set_video_mode_ega:
         ; set EGA mode 0eh (640x200x16)
@@ -518,6 +539,19 @@ set_video_mode_color400:
         ; implicitly restore the palette register for color 4 to 4
         mov     ah,0bh
         mov     bx,4
+        int     10h
+        ; housekeeping
+        call    gen_gray_luts_if_needed
+        call    prepare_color_vars_ega
+        ; adjust memory layout
+        mov     ax,[SCRATCHSEG]
+        mov     [TILELOADSEG],ax
+        ret
+
+; description:
+;       Sets the Olivetti M24 GO329's 640x200 16-color mode.
+set_video_mode_go329:
+        mov     ax,0041h                ; 640x200 16-color
         int     10h
         ; housekeeping
         call    gen_gray_luts_if_needed

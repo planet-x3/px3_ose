@@ -435,6 +435,35 @@ i_plot_tile_color400:
         tcall   i_plot_tile_cga
 
 ; description:
+;       Internal tile plotting routine for Olivetti M24 GO329.
+; parameters:
+;       si: tile bitmap
+;       di: destination offset in video memory
+; returns:
+;       di: next destination offset in video memory
+i_plot_tile_go329:
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
+        call    i_plot_tile_cga
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
+        ret
+
+; description:
 ;       Internal tile plotting routine for Amstrad PC1512 VDU.
 ; parameters:
 ;       si: tile bitmap
@@ -463,6 +492,54 @@ i_plot_tile_pc1512:
         call    i_plot_tile_cga
         mov     dx,3ddh
         mov     al,0fh
+        out     dx,al
+        ret
+
+
+; description:
+;       Internal tile plotting routine for Hercules InColor mode.
+; parameters:
+;       si: tile bitmap
+;       di: destination offset in video memory
+; returns:
+;       di: next destination offset in video memory
+i_plot_tile_incolor:
+        mov     dx,3b4h
+        mov     al,19h
+        out     dx,al
+        inc     dx
+        mov     al,60h
+        out     dx,al
+
+        mov     ax,8188
+        mov     bx,-16308
+        mov     cx,8
+        mov     dx,-636
+.L1:
+        movsb
+        movsb
+        movsb
+        movsb
+        add     di,ax
+        movsb
+        movsb
+        movsb
+        movsb
+        add     di,ax
+        sub     si,4
+        movsb
+        movsb
+        movsb
+        movsb
+        add     di,bx
+        loop    .L1
+        add     di,dx
+
+        mov     dx,3b4h
+        mov     al,19h
+        out     dx,al
+        inc     dx
+        mov     al,40h
         out     dx,al
         ret
 

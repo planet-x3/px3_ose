@@ -143,7 +143,7 @@ VIDEO_HW_PCJR_OR_BETTER equ     VIDEO_HW_PCJR_OR_TANDY | VIDEO_HW_TANDY | VIDEO_
 VIDEO_HW_COMPOSITE      equ     VIDEO_HW_CGA_LIKE | VIDEO_HW_PCJR_OR_BETTER
 
 
-VIDEOMENU               db "as",10,"Choose Video Mode: (/v)",13,10
+VIDEOMENU               db "au",10,"Choose Video Mode: (/v)",13,10
                         db "-----------------------",13,10
                         db "a-CGA Monochrome  640x200 / 2-color",13,10
                         db "b-Hercules        640x300 / 2-color",13,10
@@ -164,6 +164,8 @@ VIDEOMENU               db "as",10,"Choose Video Mode: (/v)",13,10
                         db "q-Amstrad PC1512  640x200 / 16-color",13,10
                         db "r-Quadcolor II    640x200 / 16-color",13,10
                         db "s-Sigma Color 400 640x200 / 16-color",13,10
+                        db "t-Oliv. M24 GO329 640x200 / 16-color    (WIP)",13,10
+                        db "u-Herc. InColor   640x300 / 16-color",13,10
                         db "$"
 
                         ; NOTE: Video modes using the VGA artwork are grouped together.

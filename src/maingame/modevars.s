@@ -1056,6 +1056,114 @@ mode_vars_color400:
 
 ;----------------------------------------
 
+align   2
+mode_vars_go329:
+
+.video_hw_needed        dw      VIDEO_HW_CGA_LIKE
+.VIDEO_SEG              dw      0a000h  ; Segment for video output (128 KiB from address A0000)
+
+; colors for GUI elements
+.font_bg_black          dw      0
+.font_bg_norm           dw      1
+.font_bg_norm_bright    dw      9
+.font_bg_alt            dw      4
+.font_bg_alt_bright     dw      12
+.font_bg_frame          dw      8
+.radar_color_hydro      dw      1
+.radar_color_thermal    dw      12
+.radar_color_osc        dw      8
+.radar_color_metal      dw      14
+.radar_color_marker     dw      15
+.radar_color_frame      dw      15
+
+.stride_tile            dw      4
+.framebuf_size          dw      64000
+.font_size              dw      610
+.tileset_size           dw      65535   ; we cannot get closer to 64 KiB
+.tileseg_paragraphs     dw      1000h
+.tile_offset_shift_val  dw      0
+.tile_row_offset        dw      640
+
+.fadestep_chunks        dw      (4000h / FADESTEPS)     ; FADESTEP chunks totaling CGA RAM size
+.lfsr_tap_bits          dw      0010000000010101B       ; optimal 2^14 tap bits are 14,5,3,1
+
+.file_exts              db      "CGAVGAVGAVGA"
+
+.plot_cursor            dw      plot_cursor_cga_2
+.plot_cursor_big        dw      plot_cursor_big_cga_2
+.i_plot_tile            dw      i_plot_tile_go329
+.plot_string            dw      plot_string_cga
+.plot_string_color      dw      plot_string_color_cga
+.plot8pix               dw      plot8pix_cga
+.scroll_up              dw      scroll_up_cga
+.clear_rect             dw      clear_rect_cga
+.clear_rect_white       dw      clear_rect_white_cga
+.calc_screen_offset     dw      calc_screen_offset_cga
+.mode_specific_entry    dw      dummy_func
+.mode_specific_string   dw      menu_string_transparency_n_a
+.set_video_mode         dw      set_video_mode_go329
+.restore_old_mode       dw      restore_old_mode_generic
+
+.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_color400
+.convert_tiles          dw      convert_tiles_pc1512
+.convert_screen         dw      convert_screen_pc1512
+
+;----------------------------------------
+
+align   2
+mode_vars_incolor:
+
+.video_hw_needed        dw      VIDEO_HW_MDA_LIKE       ; FIXME
+.VIDEO_SEG              dw      0b000h  ; Segment for video output
+
+; colors for GUI elements
+.font_bg_black          dw      0
+.font_bg_norm           dw      1
+.font_bg_norm_bright    dw      9
+.font_bg_alt            dw      4
+.font_bg_alt_bright     dw      12
+.font_bg_frame          dw      8
+.radar_color_hydro      dw      1
+.radar_color_thermal    dw      12
+.radar_color_osc        dw      8
+.radar_color_metal      dw      14
+.radar_color_marker     dw      15
+.radar_color_frame      dw      15
+
+.stride_tile            dw      4
+.framebuf_size          dw      64000
+.font_size              dw      610
+.tileset_size           dw      65535   ; we cannot get closer to 64 KiB
+.tileseg_paragraphs     dw      0
+.tile_offset_shift_val  dw      2
+.tile_row_offset        dw      640
+
+.fadestep_chunks        dw      (4000h / FADESTEPS)     ; FADESTEP chunks totaling CGA RAM size
+.lfsr_tap_bits          dw      0010000000010101B       ; optimal 2^14 tap bits are 14,5,3,1
+
+.file_exts              db      "CGAVGAVGAVGA"
+
+.plot_cursor            dw      plot_cursor_cga_2
+.plot_cursor_big        dw      plot_cursor_big_cga_2
+.i_plot_tile            dw      i_plot_tile_incolor
+.plot_string            dw      plot_string_hercules
+.plot_string_color      dw      plot_string_color_incolor
+.plot8pix               dw      plot8pix_incolor
+.scroll_up              dw      scroll_up_incolor
+.clear_rect             dw      clear_rect_plantronics
+.clear_rect_white       dw      clear_rect_white_plantronics
+.calc_screen_offset     dw      calc_screen_offset_cga
+.mode_specific_entry    dw      dummy_func
+.mode_specific_string   dw      menu_string_fixed_palette
+.set_video_mode         dw      set_video_mode_incolor
+.restore_old_mode       dw      restore_old_mode_hercules
+
+.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_incolor
+.convert_tiles          dw      convert_tiles_incolor
+.convert_screen         dw      convert_to_irgb_pairs_and_reorder_for_ega
+
+;----------------------------------------
+
 ; description:
 ;       Copy block of mode-specific variables to mode_vars.
 ; parameters:

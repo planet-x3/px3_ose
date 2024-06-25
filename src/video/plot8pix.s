@@ -224,6 +224,57 @@ plot8pix_cga_inverted:
 ;       bp: color
 ; returns:
 ;       di: next destination offset in video memory (es)
+plot8pix_incolor:
+        mov     dx,3b4h
+        mov     al,1ah
+        out     dx,al
+        inc     dx
+        mov     ax,bp
+        out     dx,al
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        xchg    al,ah
+        test    di,2000h
+        jz      .no_doubling
+        mov     [es:di+2000h],ax
+        .no_doubling:
+        stosw
+        mov     dx,3b5h
+        mov     al,0fh
+        out     dx,al
+        ret
+
+; description:
+;       Plotting routine for a horizontally aligned group of nominally
+;       eight pixels on nominally black background.
+; parameters:
+;       ch: bitmask
+;       di: destination offset in video memory (es)
+;       bp: color
+; returns:
+;       di: next destination offset in video memory (es)
 plot8pix_plantronics:
         shr     ch,1
         rcr     ax,1

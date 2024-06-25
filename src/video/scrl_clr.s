@@ -68,6 +68,74 @@ scroll_up_cga:
         tcall   clear_rect_cga
 
 ; description:
+;       Scrolls the contents of a rectangle up by one text line (= six logical pixels).
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen, excluding the last text line
+scroll_up_incolor:
+        mov     dx,3b4h
+        mov     al,19h
+        out     dx,al
+        inc     dx
+        mov     al,60h
+        out     dx,al
+
+        push    cx
+        push    si
+        shr     cx,2
+        mov     dx,80
+        sub     dx,cx
+        sub     dx,cx
+        push    ds
+        push    es
+        pop     ds
+        mov     si,di
+        add     si,80*3
+.L1:
+        push    cx
+        shl     cx,1
+        rep     movsb
+        pop     cx
+        add     si,dx
+        add     di,dx
+        add     si,8192-80
+        add     di,8192-80
+        dec     bx
+        jz      .L2
+        push    cx
+        shl     cx,1
+        rep     movsb
+        pop     cx
+        add     si,dx
+        add     di,dx
+        add     si,8192-80
+        add     di,8192-80
+        push    cx
+        shl     cx,1
+        rep     movsb
+        pop     cx
+        add     si,dx
+        add     di,dx
+        sub     si,16384
+        sub     di,16384
+        dec     bx
+        jnz     .L1
+.L2:
+        pop     ds
+        pop     si
+        pop     cx
+        mov     bx,6
+
+        mov     dx,3b4h
+        mov     al,19h
+        out     dx,al
+        inc     dx
+        mov     al,40h
+        out     dx,al
+        tcall   clear_rect_plantronics
+
+; description:
 ;       Clears a rectangle on screen (nominally white) on CGA.
 ; parameters:
 ;       di: destination offset in video memory (es)

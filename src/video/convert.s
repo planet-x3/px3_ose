@@ -315,6 +315,67 @@ convert_tiles_ega:
         pop     ds
         ret
 
+
+; description:
+;       Runs an entire VGA tileset through a color LUT, translates it to an
+;       EGA-friendly format and takes care of storing it in VRAM bitplanes.
+convert_tiles_incolor:
+        call    fill_transparent_pixels
+        push    ds
+        push    es
+        mov     es,[TILESEG]
+        mov     ds,[SCRATCHSEG]
+        xor     si,si
+        xor     di,di
+        mov     cx,0ffffh
+        call    convert_to_irgb_pairs_and_reorder_for_ega
+        mov     cx,4000h
+        call    copy_interleaved_bytes_to_incolor_bitplanes
+        pop     es
+        pop     ds
+        ret
+
+copy_interleaved_bytes_to_incolor_bitplanes:
+        push    ax,bx,dx
+        xor     bx,bx
+        mov     ah,01h
+
+.loop01:
+        push    cx,si,di
+        add     si,bx
+
+        mov     dx,3b4h
+        mov     al,18h
+        out     dx,al
+        inc     dx
+        mov     al,ah
+        shl     al,4
+        not     al
+        out     dx,al
+
+        shl     ah,1
+
+.loop02:
+        lodsb
+        add     si,3
+        stosb
+        loop    .loop02
+
+        pop     di,si,cx
+        inc     bl
+        cmp     bl,4
+        jne     .loop01
+
+        mov     dx,3b4h
+        mov     al,18h
+        out     dx,al
+        inc     dx
+        mov     al,0fh
+        out     dx,al
+
+        pop     dx,bx,ax
+        ret
+
 ; description:
 ;       Runs an entire VGA tileset through a color LUT, translates it to an
 ;       EGA-friendly format and takes care of storing it in VRAM bitplanes.
@@ -488,6 +549,116 @@ fadein_pixel_xfer_color400:
         mov     al,3
         out     dx,al
         movsb
+        pop     si,dx,ax
+        ret
+
+; description:
+;       Copy a group of pixels to Olivetti M24 GO329 VRAM in a way that
+;       mimics what other video modes do using "movsb" or an emulation.
+fadein_pixel_xfer_go329:
+        push    ax,dx,si
+
+        mov     ax,si
+        cmp     ax,2000h
+        cmc
+        rcr     si,1
+        and     ax,0dfffh
+        mov     dh,80
+        div     dh
+        mov     dl,ah
+        shl     si,1
+        rcl     al,1
+        mul     dh
+        mov     dh,0
+        add     ax,dx
+        mov     si,ax
+
+        mov     ax,es
+        add     ax,1000h
+        mov     es,ax
+        shl     si,2
+        lodsb
+        mov     [es:di+8000h],al
+        lodsb
+        mov     [es:di],al
+        mov     ax,es
+        sub     ax,1000h
+        mov     es,ax
+        lodsb
+        mov     [es:di+8000h],al
+        movsb
+        pop     si,dx,ax
+        ret
+
+; description:
+;       Copy a group of pixels to Hercules InColor VRAM in a way that
+;       mimics what other video modes do using "movsb" or an emulation.
+fadein_pixel_xfer_incolor:
+        push    ax,dx,si
+
+        mov     ax,si
+        cmp     ax,2000h
+        cmc
+        rcr     si,1
+        and     ax,0dfffh
+        mov     dh,80
+        div     dh
+        mov     dl,ah
+        shl     si,1
+        rcl     al,1
+        mul     dh
+        mov     dh,0
+        add     ax,dx
+        mov     si,ax
+
+        mov     dx,3b4h
+        mov     al,18h
+        out     dx,al
+        inc     dx
+        mov     al,0efh
+        out     dx,al
+        shl     si,2
+        test    di,2000h
+        jnz     .odd
+        lodsb
+        mov     [es:di],al
+        mov     al,0dfh
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     al,0bfh
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     al,7fh
+        out     dx,al
+        movsb
+        mov     al,0fh
+        out     dx,al
+        pop     si,dx,ax
+        ret
+        .odd:
+        lodsb
+        mov     [es:di],al
+        mov     [es:di+2000h],al
+        mov     al,0dfh
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     [es:di+2000h],al
+        mov     al,0bfh
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     [es:di+2000h],al
+        mov     al,7fh
+        out     dx,al
+        lodsb
+        mov     [es:di],al
+        mov     [es:di+2000h],al
+        inc     di
+        mov     al,0fh
+        out     dx,al
         pop     si,dx,ax
         ret
 
