@@ -1415,8 +1415,8 @@ music_mode_vars_mmb:
 .ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
 .ssy_mus_data_size      dw      32768
 .ssy_base_port          dw      300h
-.ssy_wr                 dw      dummy_func ; mmb_out_c0_emu
-.ssy_device_init_func   dw      dummy_func ; mmb_init
+.ssy_wr                 dw      mmb_out_c0_emu
+.ssy_device_init_func   dw      mmb_init
 .ssy_device_shut        dw      ssy_tandy_shut
 .ssy_device_isr         dw      dummy_func
 .ssy_init_in_menu       dw      dummy_func
@@ -1447,8 +1447,8 @@ music_mode_vars_csm:
 .ssy_seg_paragraphs     dw      860h    ; 32768 + 1536 bytes
 .ssy_mus_data_size      dw      32768
 .ssy_base_port          dw      220h
-.ssy_wr                 dw      dummy_func ; csm_out_c0_emu
-.ssy_device_init_func   dw      dummy_func ; csm_init
+.ssy_wr                 dw      mmb_out_c0_emu ; csm_out_c0_emu
+.ssy_device_init_func   dw      mmb_init ; csm_init
 .ssy_device_shut        dw      ssy_tandy_shut
 .ssy_device_isr         dw      dummy_func
 .ssy_init_in_menu       dw      dummy_func
