@@ -312,7 +312,7 @@ set_video_mode_quadcolor2:
         mov     ax,0006h                ; 640x200 mode
         int     10h
         mov     dx,3deh                 ; Quadcolor II control register
-        mov     al,10h                  ; enable output from Quadcolor II
+        mov     al,0efh                 ; enable output from Quadcolor II
         out     dx,al
         tcall   set_video_mode_etga.common
 
@@ -697,7 +697,7 @@ restore_old_mode_etga:
 ;       Restore the old video mode, disabling ETGA mode.
 restore_old_mode_quadcolor2:
         mov     dx,3deh                 ; Quadcolor II control register
-        mov     al,0                    ; disable output from Quadcolor II
+        mov     al,0ffh                 ; disable output from Quadcolor II
         out     dx,al
         mov     ah,0                    ; subfunction 0 sets video mode
         mov     al,[cs:old_mode]        ; mode saved at program start
