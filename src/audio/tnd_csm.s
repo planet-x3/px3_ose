@@ -24,8 +24,8 @@
 ; **) Partly for 8-Bit Productions LLC
 
 ; description:
-;       Initialize the Mindscape Music Board.
-mmb_init:
+;       Initialize the Covox Sound Master.
+csm_init:
         mov     dx,[cs:ssy_base_port]
         ; enable tone, disable noise (for A, B, C, respectively)
         mov     al,07h
@@ -34,19 +34,11 @@ mmb_init:
         inc     dx
         out     dx,al
         dec     dx
-        ; enable noise for 2nd chip's channel A
-        mov     al,07h
-        add     dx,2
-        out     dx,al
-        mov     al,00110111b
-        inc     dx
-        out     dx,al
-        sub     dx,3
         ret
 
 ; description:
-;       Emulate the Tandy's "out 0c0h,al" on a Mindscape Music Board
-mmb_out_c0_emu:
+;       Emulate the Tandy's "out 0c0h,al" on a Covox Sound Master
+csm_out_c0_emu:
         ; save state
         pushf
         push    ax
@@ -101,37 +93,37 @@ mmb_out_c0_emu:
 .not_tone_3_attenuation:
         cmp     al,60h
         jne     .not_noise_control
-        ; noise control (mapped to 2nd chip's noise period)
-        mov     cl,ah
-        and     cl,3
-        cmp     cl,3
-        je      .noise_period_custom
-        ; set a fixed noise period as specified
-        mov     al,6
-        add     dx,2
-        out     dx,al
-        inc     dx
-        out     dx,al
-        mov     al,4
-        shl     al,cl
-        mov     byte [cs:.fixed_noise],1
-        jmp     .done
-        .noise_period_custom:
-        ; let the frequency handler for tone 3 set the noise period
-        mov     byte [cs:.fixed_noise],0
+        ; ; noise control (mapped to 2nd chip's noise period)
+        ; mov     cl,ah
+        ; and     cl,3
+        ; cmp     cl,3
+        ; je      .noise_period_custom
+        ; ; set a fixed noise period as specified
+        ; mov     al,6
+        ; add     dx,2
+        ; out     dx,al
+        ; inc     dx
+        ; out     dx,al
+        ; mov     al,4
+        ; shl     al,cl
+        ; mov     byte [cs:.fixed_noise],1
+        ; jmp     .done
+        ; .noise_period_custom:
+        ; ; let the frequency handler for tone 3 set the noise period
+        ; mov     byte [cs:.fixed_noise],0
         jmp     .done
 .not_noise_control:
         cmp     al,70h
         jne     .not_noise_attenuation
-        ; noise attenuation (mapped to 2nd chip's channel A amplitude)
-        mov     al,08h
-        add     dx,2
-        out     dx,al
-        not     ah
-        and     ah,0fh
-        mov     al,ah
-        inc     dx
-        out     dx,al
+        ; ; noise attenuation (mapped to 2nd chip's channel A amplitude)
+        ; mov     al,08h
+        ; add     dx,2
+        ; out     dx,al
+        ; not     ah
+        ; and     ah,0fh
+        ; mov     al,ah
+        ; inc     dx
+        ; out     dx,al
         jmp     .done
 .not_noise_attenuation:
         jmp     .done
@@ -142,20 +134,20 @@ mmb_out_c0_emu:
         jb      .not_tone_3_freq
         ; tone 3 frequency (mapped to channel C period)
         mov     bx,504h
-        cmp     byte [cs:.fixed_noise],1
-        je      .write_period
-        ; update 2nd chip's noise period if noise mode is 3
-        mov     cx,ax
-        mov     al,6
-        mov     dx,[cs:ssy_base_port]
-        add     dx,2
-        out     dx,al
-        inc     dx
-        mov     al,ch
-        shr     al,1
-        out     dx,al
-        sub     dx,3
-        mov     ax,cx
+        ; cmp     byte [cs:.fixed_noise],1
+        ; je      .write_period
+        ; ; update 2nd chip's noise period if noise mode is 3
+        ; mov     cx,ax
+        ; mov     al,6
+        ; mov     dx,[cs:ssy_base_port]
+        ; add     dx,2
+        ; out     dx,al
+        ; inc     dx
+        ; mov     al,ch
+        ; shr     al,1
+        ; out     dx,al
+        ; sub     dx,3
+        ; mov     ax,cx
         jmp     .write_period
 .not_tone_3_freq:
         cmp     al,0a0h
@@ -168,9 +160,7 @@ mmb_out_c0_emu:
         mov     bx,100h
 .write_period:
         shl     al,4
-        mov     dx,4096*4/3
-        mul     dx
-        mov     ax,dx
+        shr     ax,4
 
         ; write tone period to coarse and fine tune registers
         mov     dx,[cs:ssy_base_port]
@@ -195,4 +185,4 @@ mmb_out_c0_emu:
         ret
 
 .first_byte     db      0
-.fixed_noise    db      0
+; .fixed_noise    db      0

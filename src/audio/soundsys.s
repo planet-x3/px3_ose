@@ -920,6 +920,7 @@ ssy_tndlpt_write:
 
 %include "tnd_cms.s"
 %include "tnd_cmslpt.s"
+%include "tnd_csm.s"
 %include "tnd_mmb.s"
 %include "tnd_aylpt.s"
 
