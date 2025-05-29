@@ -311,6 +311,13 @@ set_video_mode_etga:
 set_video_mode_quadcolor2:
         mov     ax,0006h                ; 640x200 mode
         int     10h
+        push    es                      ; clear Quadcolor II memory
+        mov     es,[VIDEO_SEG]
+        xor     di,di
+        mov     cx,8000h
+        xor     ax,ax
+        rep     stosw
+        pop     es
         mov     dx,3deh                 ; Quadcolor II control register
         mov     al,0efh                 ; enable output from Quadcolor II
         out     dx,al
