@@ -99,6 +99,11 @@ parse_command_line:
         call    parse_arg_r
         jmp     .after_arg
         .not_r:
+        cmp     al,'t'
+        jne     .not_t
+        call    parse_arg_t
+        jmp     .after_arg
+        .not_t:
         tcall   command_line_syntax_error
 .after_arg:
         jmp     .param_loop
@@ -165,6 +170,15 @@ parse_arg_m:
         ; no actual argument
         mov     byte [MUSIC_ON],0
         mov     byte [cmd_arg_m],1
+        ret
+
+; description:
+;       Parse /t.
+; parameters:
+;       [in,out] si: pointer to the next character
+parse_arg_t:
+        ; no actual argument
+        mov     byte [cmd_arg_t],1
         ret
 
 ; description:

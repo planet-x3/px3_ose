@@ -982,6 +982,8 @@ set_mode_vars:
         mov     si,[mode_specific_entry]
         mov     [game_menu_items+42],si
         ; enable transparency where available
+        cmp     byte [cmd_arg_t],1
+        je      .L2
         cmp     word [mode_specific_string],menu_string_transparency_on
         jne     .L2
         mov     byte [VIDEO_TRANS],1

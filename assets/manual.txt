@@ -22,6 +22,8 @@ Command Line Options
 
 /n      Start with sound effects disabled.
 
+/t      Start with transparency disabled.
+
 /i      Start with inverted colors (2-color CGA) or the two middle colors
         swapped (4-color CGA).  For the ATI Graphics Solution's 640x200x16
         mode, /i requests MDA compatible timings.
@@ -50,11 +52,9 @@ Command Line Options
         If the argument is omitted, the default behavior is restored,
         overriding any previous use of /c.
 
-
 You can write your favorite configuration to a batch file by using echo:
 
     echo "px3_ose /va /ab /i" > px3.bat
-
 
 File Handling
 =============

@@ -121,6 +121,7 @@ cmd_arg_f               db 0    ; skip hardware detection and all sanity checks
 cmd_arg_c               db 0    ; override the one freely selectable color in CGA mode
 cmd_arg_m               db 0    ; start with music disabled
 cmd_arg_r               db 0    ; rotate composite colors 0-3 times
+cmd_arg_t               db 0    ; start with transparency disabled
 track_not_loaded        db 0    ; makes music files optional (silence instead of a crash)
 video_hw                dw 0    ; stores bit flags for detected video hardware
 cga_color_override      db 0    ; requested value for the one freely selectable CGA color
