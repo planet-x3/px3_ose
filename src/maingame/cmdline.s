@@ -95,7 +95,7 @@ parse_command_line:
         jmp     .after_arg
         .not_m:
         cmp     al,'r'
-        jne     .not_m
+        jne     .not_r
         call    parse_arg_r
         jmp     .after_arg
         .not_r:
