@@ -156,6 +156,11 @@ DRAW_STATUS_HEADQUARTERS:
         mov     si,TEXT_COMCEN2
         mov     di,[textpos_stat6]
         call    WRITE_TEXT
+        mov     al,[SELECTED_UNIT]
+        mov     ah,0
+        mov     si,ax
+        cmp     byte UNIT_AI[si],4
+        jne     .L1
         ; display number of units
         mov     al,[UNIT_COUNT_PLUNITS]
         mov     [HEXNUM],al
@@ -166,6 +171,7 @@ DRAW_STATUS_HEADQUARTERS:
         mov     [HEXNUM],al
         mov     di,[numpos_stat6]
         call    WRITE_DECNUM
+        .L1:
         ret
 
 DRAW_STATUS_MISSILE_SILO:
@@ -285,6 +291,8 @@ DRAW_COMMAND_WINDOW:
         je      .L1
         cmp     byte UNIT_AI[si],23     ; sentry tank
         je      .B1
+        cmp     byte UNIT_AI[si],4      ; headquarters' idle AI
+        je      .L9
         mov     bl,UNIT_AI[si]
         mov     bh,0
         mov     di,bx
@@ -338,7 +346,17 @@ DRAW_COMMAND_WINDOW:
         cmp     al,4                    ; frigate
         jne     .L9
         call    DRAW_COMMAND_FRIGATE
+        ret
         .L9:
+        cmp     al,20                   ; headquarters
+        jne     .L10
+        call    DRAW_COMMAND_HEADQUARTERS
+        ret
+        .L10:
+        cmp     al,9                    ; scout
+        jne     .L11
+        call    DRAW_COMMAND_SCOUT
+        .L11:
         ret
 
 DRAW_COMMAND_SMELTER:
@@ -426,6 +444,15 @@ DRAW_COMMAND_TANK:
         call    WRITE_TEXT
         ret
 
+DRAW_COMMAND_SCOUT:
+        mov     di,[textpos_cmd1l]
+        mov     si,TEXT_TANK009
+        call    WRITE_TEXT
+        mov     di,[textpos_cmd2l]
+        mov     si,TEXT_TANK008
+        call    WRITE_TEXT
+        ret
+
 DRAW_COMMAND_HEAVY_TANK:
         mov     di,[textpos_cmd1l]
         mov     si,TEXT_TANK001
@@ -482,6 +509,18 @@ DRAW_COMMAND_FACTORY:
         mov     di,[textpos_cmd6l]
         mov     si,TEXT_FACTORY006
         call    WRITE_TEXT
+        ret
+
+DRAW_COMMAND_HEADQUARTERS:
+        mov     al,[SELECTED_UNIT]
+        mov     ah,0
+        mov     si,ax
+        cmp     byte UNIT_AI[si],4
+        jne     .L1
+        mov     di,[textpos_cmd1l]
+        mov     si,TEXT_HQ001
+        call    WRITE_TEXT
+        .L1:
         ret
 
 DRAW_COMMAND_BUILDER:

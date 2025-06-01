@@ -73,6 +73,7 @@ TEXT_FACTORY004 db "H-HEAVY TANK",0
 TEXT_FACTORY005 db "F-FRIGATE",0
 TEXT_FACTORY006 db "S-SCOUT CAR",0
 TEXT_FACTORY007 db 0                    ; TODO: Change back to "F-FIGHTER",0 once implemented
+TEXT_HQ001      db "I-INFANTRY",0
 TEXT_RADAR001   db "SCAN TYPE",0
 TEXT_RADAR002   db "M-METALLIC",0
 TEXT_RADAR003   db "H-HYDROSCAN",0
@@ -271,6 +272,8 @@ CANABORT        db      0       ; 0=none
                 db      0
                 db      1       ; 40=factory making a fighter
                 db      1       ; 41=factory making a scout
+                db      1       ; 42=headquarters making soldier
+                db      0       ; 43=idle soldier
 ; block 2
 ; The following table is used to fix the cost of anything that the player
 ; will build.
@@ -399,6 +402,52 @@ SCAN_MAP_FOR_INITIAL_UNITS:
         mov     ds,[MAPSEG]
         jmp     .L20
         .L2a:
+        cmp     al,52h                  ; soldier
+        jne     .L2b
+        pop     ds
+        mov     ah,8                    ; type = soldier
+        mov     dl,10                   ; health = 10
+        mov     bx,1                    ; under = <right>
+        call    SCAN_MAP_CREATE_UNIT
+        mov     byte UNIT_AI[di],43     ; idle soldier
+        push    ds
+        mov     ds,[MAPSEG]
+        jmp     .L20
+        .L2b:
+        cmp     al,53h                  ; soldier
+        jne     .L2c
+        pop     ds
+        mov     ah,8                    ; type = soldier
+        mov     dl,10                   ; health = 10
+        mov     bx,-1                   ; under = <left>
+        call    SCAN_MAP_CREATE_UNIT
+        mov     byte UNIT_AI[di],43     ; idle soldier
+        push    ds
+        mov     ds,[MAPSEG]
+        jmp     .L20
+        .L2c:
+        cmp     al,54h                  ; scout
+        jne     .L2d
+        pop     ds
+        mov     ah,9                    ; type = scout
+        mov     dl,20                   ; health = 20
+        mov     bx,1                    ; under = <right>
+        call    SCAN_MAP_CREATE_UNIT
+        push    ds
+        mov     ds,[MAPSEG]
+        jmp     .L20
+        .L2d:
+        cmp     al,55h                  ; scout
+        jne     .L2e
+        pop     ds
+        mov     ah,9                    ; type = scout
+        mov     dl,20                   ; health = 20
+        mov     bx,-1                   ; under = <left>
+        call    SCAN_MAP_CREATE_UNIT
+        push    ds
+        mov     ds,[MAPSEG]
+        jmp     .L20
+        .L2e:
         cmp     al,58h                  ; tank
         jne     .L3
         pop     ds
@@ -457,6 +506,8 @@ SCAN_MAP_FOR_INITIAL_UNITS:
 ;       ah: unit type
 ;       dl: unit health
 ;       bx: offset of substitute tile_under on map
+; returns:
+;       di: unit index
 SCAN_MAP_CREATE_UNIT:
         mov     di,0
         .L1:
@@ -481,56 +532,6 @@ SCAN_MAP_CREATE_UNIT:
         mov     UNIT_TILE_UNDER[di],al
         .L3:
         ret
-
-; SCAN_MAP_CREATE_SOLDIER:
-        ; mov     di,0
-        ; .L1:
-        ; cmp     byte UNIT_TYPE[di],0
-        ; je      .L2
-        ; inc     di
-        ; cmp     di,20
-        ; je      .L3
-        ; jmp     .L1
-        ; .L2:
-        ; mov     byte UNIT_TYPE[di],8         ; soldier
-        ; mov     byte UNIT_TILE[di],52h       ; soldier tile
-        ; mov     byte UNIT_HEALTH[di],5
-        ; mov     ax,si
-        ; mov     UNIT_LOCATION_X[di],al
-        ; mov     UNIT_LOCATION_Y[di],ah
-        ; ; find tile to right, use as under-tile
-        ; push    ds
-        ; mov     ds,[MAPSEG]
-        ; mov     al,byte [1+si]   ; get tile to the right
-        ; pop     ds
-        ; mov     UNIT_TILE_UNDER[di],al
-        ; .L3:
-        ; ret
-
-; SCAN_MAP_CREATE_SCOUT:
-        ; mov     di,0
-        ; .L1:
-        ; cmp     byte UNIT_TYPE[di],0
-        ; je      .L2
-        ; inc     di
-        ; cmp     di,20
-        ; je      .L3
-        ; jmp     .L1
-        ; .L2:
-        ; mov     byte UNIT_TYPE[di],9         ; scout
-        ; mov     byte UNIT_TILE[di],54h       ; scout tile
-        ; mov     byte UNIT_HEALTH[di],20
-        ; mov     ax,si
-        ; mov     UNIT_LOCATION_X[di],al
-        ; mov     UNIT_LOCATION_Y[di],ah
-        ; ; find tile to right, use as under-tile
-        ; push    ds
-        ; mov     ds,[MAPSEG]
-        ; mov     al,byte [1+si]   ; get tile to the right
-        ; pop     ds
-        ; mov     UNIT_TILE_UNDER[di],al
-        ; .L3:
-        ; ret
 
 ; SCAN_MAP_CREATE_FIGHTER:
         ; mov     di,0
@@ -973,7 +974,11 @@ ML052:  cmp     al,'v'                  ; v-key
         jne     ML053
         call    KEY_COMMAND_V
         jmp     MAINLOOP
-ML053:  cmp     Ah,049h                 ; PAGE UP key
+ML053:  cmp     al,'i'                  ; i-key
+        jne     ML053a
+        call    KEY_COMMAND_I
+        jmp     MAINLOOP
+ML053a: cmp     Ah,049h                 ; PAGE UP key
         jne     ML054
         call    CYCLE_BUILDING_BACKWARD
 ML054:  cmp     ah,02h                  ; numbers 0 to 9
@@ -1083,6 +1088,21 @@ KEY_COMMAND_F:
         KEYF02:
         ret
 
+KEY_COMMAND_I:
+        mov     al,[SELECTED_UNIT]
+        mov     ah,0
+        mov     si,ax
+        cmp     byte UNIT_AI[si],4      ; check for AI in progress
+        je      KEYI01
+        ret
+        KEYI01:
+        cmp     byte UNIT_TYPE[si],20   ; headquarters
+        jne     KEYI02
+        call    HQ_BUILD_SOLDIER
+        ret
+        KEYI02:
+        ret
+
 KEY_COMMAND_S:
         mov     al,[SELECTED_UNIT]
         mov     ah,0
@@ -1186,7 +1206,13 @@ KEY_COMMAND_A:
         mov     [UNIT_SCAN],al
         call    BUILD_ABORT
         .L6:
+        cmp     byte UNIT_TYPE[si],8            ; soldier
+        jne     .L7
+        mov     byte UNIT_AI[si],43             ; soldier idle AI
+        jmp     .L8
+        .L7:
         mov     byte UNIT_AI[si],0
+        .L8:
         mov     byte UNIT_WORKING[si],0
         mov     byte [REDRAW_COMWIN_REQ],1
         mov     byte [REDRAW_STATUS_REQ],1
@@ -1337,6 +1363,10 @@ KEY_COMMAND_M:
         jne     .L2
         call    TANK_FIRE               ; manual fire
         .L2:
+        cmp     byte UNIT_TYPE[si],9    ; scout
+        jne     .L3
+        call    TANK_FIRE               ; manual fire
+        .L3:
         ret
 
 KEY_COMMAND_P:
@@ -1781,7 +1811,7 @@ FACTORY_BUILD_SCOUT:
         cmp     byte UNIT_AI[si],0      ; is it already building something?
         jne     .L2
         ; check for resources
-        mov     byte [TEMP_A],08        ; builder
+        mov     byte [TEMP_A],08        ; scout ~= builder
         call    CHECK_RESOURCES
         cmp     byte [TEMP_A],0
         je      .L2
@@ -1790,6 +1820,31 @@ FACTORY_BUILD_SCOUT:
         mov     si,ax
         mov     byte UNIT_WORKING[si],1
         mov     byte UNIT_AI[si],41     ; BUILD scout
+        mov     byte UNIT_TIMER[si],30
+        call    CLEAR_COMMAND_WINDOW
+        call    DRAW_STATUS_WINDOW
+        mov     al,14                   ; selects CONSTRUCTION SOUND
+        mov     ah,128                  ; priority
+        call    m_playSFX               ; play sound effect
+        .L2:
+        ret
+
+HQ_BUILD_SOLDIER:
+        mov     al,[SELECTED_UNIT]
+        mov     ah,0
+        mov     si,ax
+        cmp     byte UNIT_AI[si],4      ; is it already building something?
+        jne     .L2
+        ; check for resources
+        mov     byte [TEMP_A],12        ; soldier ~= bridge piece
+        call    CHECK_RESOURCES
+        cmp     byte [TEMP_A],0
+        je      .L2
+        mov     al,[SELECTED_UNIT]
+        mov     ah,0
+        mov     si,ax
+        mov     byte UNIT_WORKING[si],1
+        mov     byte UNIT_AI[si],42     ; BUILD soldier
         mov     byte UNIT_TIMER[si],30
         call    CLEAR_COMMAND_WINDOW
         call    DRAW_STATUS_WINDOW
@@ -2136,8 +2191,12 @@ BROWSE_FOR_UNIT:
         mov     si,ax
         cmp     byte UNIT_AI[si],0
         je      BFU00
+        cmp     byte UNIT_AI[si],43
+        je      BFU00
         ret
         BFU00:
+        mov     al,UNIT_AI[si]
+        mov     byte UNIT_GEN_A[si],al          ; AI once reached destination
         mov     al,[SELECTED_UNIT]
         mov     ah,0
         mov     si,ax
@@ -2149,7 +2208,6 @@ BROWSE_FOR_UNIT:
         mov     byte UNIT_ALTMOVE_Y[si],0
         mov     byte UNIT_AI[si],5              ; traveller AI
         mov     byte UNIT_TIMER[si],7
-        mov     byte UNIT_GEN_A[si],0           ; AI once reached destination
         mov     byte [REDRAW_COMWIN_REQ],1
         mov     byte [REDRAW_STATUS_REQ],1
         ret
@@ -2166,6 +2224,8 @@ MOVEDOWN:
         mov     ah,0
         mov     si,ax
         cmp     byte UNIT_AI[si],0
+        je      MDW08
+        cmp     byte UNIT_AI[si],43
         je      MDW08
         ret
         MDW08:
@@ -2197,6 +2257,8 @@ MOVEUP:
         mov     si,ax
         cmp     byte UNIT_AI[si],0
         je      MUP08
+        cmp     byte UNIT_AI[si],43
+        je      MUP08
         ret
         MUP08:
         ; Check that unit is stil alive:
@@ -2227,6 +2289,8 @@ MOVERIGHT:
         mov     si,ax
         cmp     byte UNIT_AI[si],0
         je      MRT08
+        cmp     byte UNIT_AI[si],43
+        je      MRT08
         ret
         MRT08:
         ; Check that unit is stil alive:
@@ -2256,6 +2320,8 @@ MOVELEFT:
         mov     ah,0
         mov     si,ax
         cmp     byte UNIT_AI[si],0
+        je      MLF08
+        cmp     byte UNIT_AI[si],43
         je      MLF08
         ret
         MLF08:
