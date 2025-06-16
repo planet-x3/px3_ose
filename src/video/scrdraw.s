@@ -151,6 +151,7 @@ tile_to_overwrite       dw      0
 tiles_to_overwrite      resb    19*9
 
 draw_entire_screen_with_transparency:
+        mov     word [tile_to_overwrite],tiles_to_overwrite
         mov     byte [CURSOR_X],0
         mov     byte [CURSOR_Y],0
         .DES01: ; we do all this stuff one time.
@@ -166,7 +167,7 @@ draw_entire_screen_with_transparency:
         pop     ds
         mov     [TEMP_A],al
         call    find_screen_location
-        call    plot_tile_on_bg_vga
+        call    plot_tile_on_bg_vga_lazy
         inc     byte [CURSOR_X]
         .DES02: ; and now we just adjust as we draw across the screen.
         inc     word [TEMP_MAP_LOC]
@@ -176,7 +177,7 @@ draw_entire_screen_with_transparency:
         mov     al,[si]
         pop     ds
         mov     [TEMP_A],al
-        call    plot_tile_on_bg_vga
+        call    plot_tile_on_bg_vga_lazy
         inc     byte [CURSOR_X]
         mov     cl,[SCREEN_WIDTH]
         cmp     [CURSOR_X],cl
@@ -835,8 +836,7 @@ plot_tile_on_bg_vga:                            ; used for plotting tile elsewhe
         jne     .L0
         mov     bx,word [TEMP_A]                ; check if tile should be transparent
         cmp     byte TRANSPARENCY[bx],1
-        jne     .L0
-        jmp     .L2
+        je      .L2
         ; standard tile copy routine, no transparency
         .L0:
         push    ds
@@ -858,6 +858,54 @@ plot_tile_on_bg_vga:                            ; used for plotting tile elsewhe
         call    i_plot_tile_on_bg_vga
 
         pop     ds                              ; restore default segment
+        ret
+
+plot_tile_on_bg_vga_lazy:                       ; used for plotting tile elsewhere (lazy)
+        ; find tile location
+        cmp     byte [VIDEO_TRANS],1
+        jne     .L0
+        mov     bx,word [TEMP_A]                ; check if tile should be transparent
+        cmp     byte TRANSPARENCY[bx],1
+        je      .L2
+        ; standard tile copy routine, no transparency
+        .L0:
+        mov     bx,[tile_to_overwrite]
+        mov     al,[TEMP_A]
+        cmp     al,[ds:bx]
+        je      .lazy
+        mov     [ds:bx],al
+        inc     word [tile_to_overwrite]
+
+        mov     si,word [TEMP_A_TIMES_256]      ; tile number multiplied by 256
+        push    ds
+        push    cx
+        mov     ds,[TILESEG]
+
+        call    i_plot_tile_vga
+
+        pop     cx
+        pop     ds
+        ret
+
+        ; transparent copy routine.
+        .L2:
+        mov     bx,[tile_to_overwrite]
+        mov     byte [ds:bx],0a7h               ; tile: final step of nuclear explosion
+        inc     word [tile_to_overwrite]
+
+        mov     si,word [TEMP_A_TIMES_256]      ; tile number multiplied by 256
+        call    get_tile_under_unit
+        push    ds
+        mov     ds,[TILESEG]                    ; ds = segment of all tile data
+
+        call    i_plot_tile_on_bg_vga
+
+        pop     ds                              ; restore default segment
+        ret
+
+        .lazy:
+        inc     word [tile_to_overwrite]
+        add     di,16
         ret
 
 ; description:
