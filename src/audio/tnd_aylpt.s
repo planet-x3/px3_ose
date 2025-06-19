@@ -1,5 +1,5 @@
 ; Engine of Planet X3, a real-time strategy game originally for MS-DOS.
-; Copyright (C) 2018-2023  8-Bit Productions LLC and contributors
+; Copyright (C) 2018-2025  8-Bit Productions LLC and contributors
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -99,31 +99,6 @@ aylpt_init:
         call    aylpt_output_first_address
         mov     al,00111000b
         call    aylpt_output_first_data
-        ; ; reset voices
-        ; mov     al,1ch
-        ; call    aylpt_output_first_address
-        ; mov     al,02h
-        ; call    aylpt_output_first_data
-        ; ; disable noise
-        ; mov     al,15h
-        ; call    aylpt_output_first_address
-        ; mov     al,00h
-        ; call    aylpt_output_first_data
-        ; ; enable voices
-        ; mov     al,1ch
-        ; call    aylpt_output_first_address
-        ; mov     al,01h
-        ; call    aylpt_output_first_data
-        ; ; enable tone generators
-        ; mov     al,14h
-        ; call    aylpt_output_first_address
-        ; mov     al,15h  ; voices 4, 2, 0
-        ; call    aylpt_output_first_data
-        ; ; enable noise generators
-        ; mov     al,15h
-        ; call    aylpt_output_first_address
-        ; mov     al,02h  ; voice 1
-        ; call    aylpt_output_first_data
         ret
 
 ; description:
@@ -148,13 +123,10 @@ aylpt_out_c0_emu:
         cmp     al,10h
         jne     .not_tone_1_attenuation
         ; tone 1 attenuation (mapped to channel A amplitude)
-        mov     al,08h
-        call    aylpt_output_first_address
         not     ah
         and     ah,0fh
-        mov     al,ah
-        call    aylpt_output_first_data
-        jmp     .done
+        mov     [cs:.amp_a],ah
+        jmp     .handle_ch_a_prios
 .not_tone_1_attenuation:
         cmp     al,30h
         jne     .not_tone_2_attenuation
@@ -180,26 +152,31 @@ aylpt_out_c0_emu:
 .not_tone_3_attenuation:
         cmp     al,60h
         jne     .not_noise_control
-        ; ; noise control (mapped to noise generator 0 control -- lower nibble)
-        ; mov     al,16h
-        ; call    aylpt_output_first_address
-        ; mov     al,ah
-        ; and     al,03h
-        ; call    aylpt_output_first_data
+        ; noise control (mapped to noise period)
+        mov     cl,ah
+        and     cl,3
+        cmp     cl,3
+        je      .noise_period_custom
+        ; set a fixed noise period as specified
+        mov     al,6
+        call    aylpt_output_first_address
+        mov     al,4
+        shl     al,cl
+        call    aylpt_output_first_data
+        mov     byte [cs:.fixed_noise],1
+        jmp     .done
+        .noise_period_custom:
+        ; let the frequency handler for tone 3 set the noise period
+        mov     byte [cs:.fixed_noise],0
         jmp     .done
 .not_noise_control:
         cmp     al,70h
         jne     .not_noise_attenuation
-        ; ; noise attenuation (mapped to channel 1 amplitude)
-        ; mov     al,01h
-        ; call    aylpt_output_first_address
-        ; not     ah
-        ; and     ah,0fh
-        ; mov     al,ah
-        ; shl     ah,4
-        ; or      al,ah
-        ; call    aylpt_output_first_data
-        jmp     .done
+        ; noise attenuation (mapped to channel A amplitude)
+        not     ah
+        and     ah,0fh
+        mov     [cs:.amp_n],ah
+        jmp     .handle_ch_a_prios
 .not_noise_attenuation:
         jmp     .done
 .is_second_byte:
@@ -243,4 +220,33 @@ aylpt_out_c0_emu:
         popf
         ret
 
+.handle_ch_a_prios:
+        mov     al,08h
+        call    aylpt_output_first_address
+        mov     al,[cs:.amp_a]
+        mov     ah,[cs:.amp_n]
+        mov     bl,00110000b
+        or      al,al
+        jnz     .amp_a_not_0
+        or      bl,00000001b
+        .amp_a_not_0:
+        or      ah,ah
+        jnz     .amp_n_not_0
+        or      bl,00001000b
+        .amp_n_not_0:
+        cmp     al,ah
+        jae     .amp_a_tone_is_louder
+        mov     al,ah
+        .amp_a_tone_is_louder:
+        call    aylpt_output_first_data
+
+        mov     al,07h
+        call    aylpt_output_first_address
+        mov     al,bl
+        call    aylpt_output_first_data
+        jmp     .done
+
 .first_byte     db      0
+.fixed_noise    db      0
+.amp_a          db      0
+.amp_n          db      0

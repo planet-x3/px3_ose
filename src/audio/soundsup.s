@@ -47,7 +47,7 @@ SOUNDMENU               db      "ao"
                         db      "l-LPTSID/ParaSID                        (WIP)",13,10
                         db      "m-Mindscape Music Board",13,10
                         db      "n-AY-LPT (BC1 on 17, BDIR on 1)         (WIP)",13,10
-                        db      "o-Covox Sound Master                    (WIP)",13,10
+                        db      "o-Covox Sound Master",13,10
                         db      "$"
 
 

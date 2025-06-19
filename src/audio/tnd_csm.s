@@ -58,14 +58,10 @@ csm_out_c0_emu:
         cmp     al,10h
         jne     .not_tone_1_attenuation
         ; tone 1 attenuation (mapped to channel A amplitude)
-        mov     al,08h
-        out     dx,al
         not     ah
         and     ah,0fh
-        mov     al,ah
-        inc     dx
-        out     dx,al
-        jmp     .done
+        mov     [cs:.amp_a],ah
+        jmp     .handle_ch_a_prios
 .not_tone_1_attenuation:
         cmp     al,30h
         jne     .not_tone_2_attenuation
@@ -93,38 +89,32 @@ csm_out_c0_emu:
 .not_tone_3_attenuation:
         cmp     al,60h
         jne     .not_noise_control
-        ; ; noise control (mapped to 2nd chip's noise period)
-        ; mov     cl,ah
-        ; and     cl,3
-        ; cmp     cl,3
-        ; je      .noise_period_custom
-        ; ; set a fixed noise period as specified
-        ; mov     al,6
-        ; add     dx,2
-        ; out     dx,al
-        ; inc     dx
-        ; out     dx,al
-        ; mov     al,4
-        ; shl     al,cl
-        ; mov     byte [cs:.fixed_noise],1
-        ; jmp     .done
-        ; .noise_period_custom:
-        ; ; let the frequency handler for tone 3 set the noise period
-        ; mov     byte [cs:.fixed_noise],0
+        ; noise control (mapped to noise period)
+        mov     cl,ah
+        and     cl,3
+        cmp     cl,3
+        je      .noise_period_custom
+        ; set a fixed noise period as specified
+        mov     al,6
+        out     dx,al
+        inc     dx
+        mov     al,4
+        shl     al,cl
+        out     dx,al
+        mov     byte [cs:.fixed_noise],1
+        jmp     .done
+        .noise_period_custom:
+        ; let the frequency handler for tone 3 set the noise period
+        mov     byte [cs:.fixed_noise],0
         jmp     .done
 .not_noise_control:
         cmp     al,70h
         jne     .not_noise_attenuation
-        ; ; noise attenuation (mapped to 2nd chip's channel A amplitude)
-        ; mov     al,08h
-        ; add     dx,2
-        ; out     dx,al
-        ; not     ah
-        ; and     ah,0fh
-        ; mov     al,ah
-        ; inc     dx
-        ; out     dx,al
-        jmp     .done
+        ; noise attenuation (mapped to channel A amplitude)
+        not     ah
+        and     ah,0fh
+        mov     [cs:.amp_n],ah
+        jmp     .handle_ch_a_prios
 .not_noise_attenuation:
         jmp     .done
 .is_second_byte:
@@ -134,20 +124,19 @@ csm_out_c0_emu:
         jb      .not_tone_3_freq
         ; tone 3 frequency (mapped to channel C period)
         mov     bx,504h
-        ; cmp     byte [cs:.fixed_noise],1
-        ; je      .write_period
-        ; ; update 2nd chip's noise period if noise mode is 3
-        ; mov     cx,ax
-        ; mov     al,6
-        ; mov     dx,[cs:ssy_base_port]
-        ; add     dx,2
-        ; out     dx,al
-        ; inc     dx
-        ; mov     al,ch
-        ; shr     al,1
-        ; out     dx,al
-        ; sub     dx,3
-        ; mov     ax,cx
+        cmp     byte [cs:.fixed_noise],1
+        je      .write_period
+        ; update noise period if noise mode is 3
+        mov     cx,ax
+        mov     al,6
+        mov     dx,[cs:ssy_base_port]
+        out     dx,al
+        inc     dx
+        mov     al,ch
+        shr     al,1
+        out     dx,al
+        dec     dx
+        mov     ax,cx
         jmp     .write_period
 .not_tone_3_freq:
         cmp     al,0a0h
@@ -184,5 +173,37 @@ csm_out_c0_emu:
         popf
         ret
 
+.handle_ch_a_prios:
+        mov     al,08h
+        out     dx,al
+        mov     al,[cs:.amp_a]
+        mov     ah,[cs:.amp_n]
+        mov     bl,00110000b
+        or      al,al
+        jnz     .amp_a_not_0
+        or      bl,00000001b
+        .amp_a_not_0:
+        or      ah,ah
+        jnz     .amp_n_not_0
+        or      bl,00001000b
+        .amp_n_not_0:
+        cmp     al,ah
+        jae     .amp_a_tone_is_louder
+        mov     al,ah
+        .amp_a_tone_is_louder:
+        inc     dx
+        out     dx,al
+
+        dec     dx
+        mov     al,07h
+        out     dx,al
+        inc     dx
+        mov     al,bl
+        out     dx,al
+        dec     dx
+        jmp     .done
+
 .first_byte     db      0
-; .fixed_noise    db      0
+.fixed_noise    db      0
+.amp_a          db      0
+.amp_n          db      0
