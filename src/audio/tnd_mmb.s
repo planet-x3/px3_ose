@@ -111,9 +111,9 @@ mmb_out_c0_emu:
         add     dx,2
         out     dx,al
         inc     dx
-        out     dx,al
         mov     al,4
         shl     al,cl
+        out     dx,al
         mov     byte [cs:.fixed_noise],1
         jmp     .done
         .noise_period_custom:
