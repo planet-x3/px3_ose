@@ -22,6 +22,8 @@ Command Line Options
 
 /n      Start with sound effects disabled.
 
+/t      Start with transparency disabled.
+
 /i      Start with inverted colors (2-color CGA) or the two middle colors
         swapped (4-color CGA).  For the ATI Graphics Solution's 640x200x16
         mode, /i requests MDA compatible timings.
@@ -50,11 +52,9 @@ Command Line Options
         If the argument is omitted, the default behavior is restored,
         overriding any previous use of /c.
 
-
 You can write your favorite configuration to a batch file by using echo:
 
     echo "px3_ose /va /ab /i" > px3.bat
-
 
 File Handling
 =============
@@ -106,9 +106,9 @@ Heavy tank      Can fire its cannon at various targets. Can be used in statio-
                 nary, sentry mode to automatically shoot at enemy units.
 Frigate         This is basically a swimming tank. The factory needs to be at
                 the shore to build one.
-Scout           Can be used to explore the map. Cannot do anything else, yet.
-Soldier         As you can imagine, this one is not built in a factory.
-                For the time being, they are nowhere to be found.
+Scout           Can be used to explore the map and to manually attack targets.
+Soldier         Comes straight from your headquarters and will eagerly fire at
+                enemy units within range, with no need for constant orders.
 Fighter jet     Your researchers are still figuring out how to build these and
                 what to do with them. However, no factory will be able to
                 build both, frigates and fighter jets.

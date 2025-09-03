@@ -805,4 +805,4 @@ load_maplist:
         mov     bx,[handle]
         int     21h
         ret
-.maplist_name   db "MAPLIST.BIN"
+.maplist_name   db "MAPLIST.BIN",0

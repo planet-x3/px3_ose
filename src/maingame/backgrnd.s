@@ -44,7 +44,7 @@ BACKGROUND_ROUTINE:
         xor     bx,bx
         mov     bl,UNIT_AI[si]
         dec     bl
-        cmp     bl,40                           ; bounds check
+        cmp     bl,42                           ; bounds check
         ja      .L20
         shl     bx,1
         call    [bx+.jtab]
@@ -104,6 +104,8 @@ BACKGROUND_ROUTINE:
         dw      AI_PROT_TANK
         dw      AI_BUILD_FIGHTER
         dw      AI_BUILD_SCOUT
+        dw      AI_BUILD_SOLDIER
+        dw      AI_SOLDIER
 
 UPDATE_INFO_WINDOW:
         cmp     byte [INFO_TIMER2],5
@@ -1171,7 +1173,7 @@ AI_SENTRY_TANK:
         mov     ah,0
         mov     si,ax
         sub     si,94h
-        mov     al,byte [cs:SENTRY_SPIN+si]
+        mov     al,byte [cs:.SENTRY_SPIN+si]
         mov     byte [di],al
         pop     ds
         mov     si,[UNIT_SCAN]
@@ -1179,7 +1181,7 @@ AI_SENTRY_TANK:
         cmp     byte UNIT_GEN_A[si],0
         je      .L04
         dec     byte UNIT_GEN_A[si]
-        jmp     SENTANK20
+        jmp     .SENTANK20
         .L04:
         ; check for enemy units nearby
         mov     di,64                   ; start of enemy units
@@ -1190,7 +1192,7 @@ AI_SENTRY_TANK:
         inc     di
         cmp     di,196                  ; end of enemy units
         jne     .L05
-        jmp     SENTANK20               ; none found
+        jmp     .SENTANK20              ; none found
         .L10:
         mov     al,UNIT_LOCATION_X[di]  ; enemy unit
         mov     UNIT_DEST_X[si],al      ; location dest
@@ -1235,10 +1237,95 @@ AI_SENTRY_TANK:
         call    m_playSFX               ; play sound
         .L21:
         ret
-        SENTANK20:
+        .SENTANK20:
         call    CHECK_WINDOW_FOR_ACTION
         ret
-        SENTRY_SPIN     db 96h,97h,95h,94h
+        .SENTRY_SPIN    db 96h,97h,95h,94h
+
+AI_SOLDIER:
+        mov     byte UNIT_TIMER[si],5
+        mov     al,UNIT_LOCATION_X[si]
+        mov     ah,UNIT_LOCATION_Y[si]
+        mov     di,ax
+        mov     si,[UNIT_SCAN]
+        ; check if it is okay to fire again
+        cmp     byte UNIT_GEN_A[si],0
+        je      .L04
+        dec     byte UNIT_GEN_A[si]
+        jmp     .SOLDIER20
+        .L04:
+        ; check for enemy units nearby
+        mov     di,64                   ; start of enemy units
+        .L05:
+        cmp     byte UNIT_TYPE[di],0
+        jne     .L10
+        .L06:
+        inc     di
+        cmp     di,196                  ; end of enemy units
+        jne     .L05
+        jmp     .SOLDIER20              ; none found
+        .L10:
+        mov     al,UNIT_LOCATION_X[di]  ; enemy unit
+        mov     UNIT_DEST_X[si],al      ; location dest
+        mov     al,UNIT_LOCATION_Y[di]
+        mov     UNIT_DEST_Y[si],al
+        call    CHECK_DISTANCE_TO_DESTINATION
+        cmp     byte [TEMP_X],5
+        ja      .L06
+        cmp     byte [TEMP_Y],4
+        ja      .L06
+        mov     ax,di
+        mov     [TEMP_A],al             ; store target unit#
+        ; set soldier's orientation
+        and     byte UNIT_TILE[si],0feh
+        mov     al,UNIT_LOCATION_X[si]
+        cmp     al,UNIT_LOCATION_X[di]
+        adc     byte UNIT_TILE[si],0
+        push    di
+        mov     al,UNIT_LOCATION_X[si]
+        mov     ah,UNIT_LOCATION_Y[si]
+        mov     di,ax
+        mov     al,UNIT_TILE[si]
+        push    ds
+        mov     ds,[MAPSEG]
+        mov     byte [di],al
+        pop     ds
+        pop     di
+        ; find new projectile unit number
+        mov     di,196
+        .L15:
+        mov     al,UNIT_TYPE[di]
+        cmp     al,0
+        je      .L20
+        inc     di
+        cmp     di,212
+        jne     .L15
+        ret                             ; failure to find free projectile unit
+        .L20:
+        ; set information for projectile
+        mov     byte UNIT_TYPE[di],28   ; projectile unit type
+        mov     byte UNIT_AI[di],11     ; projectile ai
+        mov     byte UNIT_GEN_A[di],5   ; damage
+        mov     al,[TEMP_A]
+        mov     UNIT_GEN_B[di],al       ; fire at unit#
+        mov     byte UNIT_TILE[di],0b7h ; blue projectile tile
+        mov     byte UNIT_TIMER[di],2
+        mov     al,UNIT_LOCATION_X[si]  ; projectile starting location
+        mov     UNIT_LOCATION_X[di],al
+        mov     al,UNIT_LOCATION_Y[si]
+        mov     UNIT_LOCATION_Y[di],al
+        mov     byte UNIT_GEN_A[si],5   ; firing delay
+        call    CHECK_WINDOW_FOR_ACTION_S
+        cmp     byte [WINDOW_ACTION],1
+        jne     .L21
+        mov     al,04                   ; shooting sound
+        mov     ah,128                  ; priority
+        call    m_playSFX               ; play sound
+        .L21:
+        ret
+        .SOLDIER20:
+        call    CHECK_WINDOW_FOR_ACTION
+        ret
 
 AI_NUCLEAR_MISSILE:
         mov     byte UNIT_TIMER[si],1
@@ -2326,6 +2413,72 @@ AI_BUILD_BUILDER:
         mov     byte UNIT_WORKING[si],00
         mov     byte UNIT_TILE[si],50h
         mov     byte UNIT_HEALTH[si],20
+        mov     byte UNIT_GEN_A[si],0
+        mov     byte UNIT_GEN_B[si],0
+        mov     byte UNIT_GEN_C[si],0
+        mov     UNIT_LOCATION_X[si],al
+        mov     UNIT_LOCATION_Y[si],ah
+        call    PLOT_UNIT_ON_MAP
+        call    CHECK_WINDOW_FOR_ACTION
+        .L7:
+        ; check if this unit is selected
+        mov     al,[UNIT_SCAN]
+        cmp     [SELECTED_UNIT],al
+        je      .L8
+        ret
+        .L8:
+        mov     byte [REDRAW_COMWIN_REQ],1
+        mov     byte [REDRAW_STATUS_REQ],1
+        ret
+
+AI_BUILD_SOLDIER:
+        mov     byte UNIT_TIMER[si],1           ; reset timer delay
+        inc     byte UNIT_WORKING[si]
+        cmp     byte UNIT_WORKING[si],12        ; finished
+        je      .L3
+        mov     al,[UNIT_SCAN]
+        cmp     al,[SELECTED_UNIT]
+        jne     .L1
+        mov     byte [REDRAW_COMWIN_REQ],1
+        mov     byte [REDRAW_STATUS_REQ],1
+        .L1:
+        ret
+        .L3:
+        mov     byte UNIT_WORKING[si],0
+        mov     byte UNIT_AI[si],4              ; re-enable headquarters' idle AI
+        call    FIND_DELIVERY_LOCATION          ; returns x in al, y in ah, failure in zf
+        jnz     .L2                             ; skip error message in case of success
+        mov     si,INFO_BLOCKED1
+        call    WRITE_NEW_MESSAGE
+        mov     si,INFO_BLOCKED2
+        call    WRITE_NEW_MESSAGE
+        mov     al,0                            ; selects SOUND "0" (ERROR)
+        mov     ah,150                          ; priority
+        call    m_playSFX                       ; play sound effect
+        jmp     .L7
+        .L2:
+        mov     si,0
+        .L4:                                    ; get new unit#
+        cmp     byte UNIT_TYPE[si],0
+        je      .L6
+        inc     si
+        cmp     si,20
+        jne     .L4
+        mov     si,INFO_MAXERR03
+        call    WRITE_NEW_MESSAGE
+        mov     si,INFO_MAXERR02
+        call    WRITE_NEW_MESSAGE
+        mov     al,0                            ; selects SOUND "0" (ERROR)
+        mov     ah,150                          ; priority
+        call    m_playSFX                       ; play sound effect
+        jmp     .L7
+        .L6:
+        ; create infantry unit
+        mov     byte UNIT_TYPE[si],08
+        mov     byte UNIT_AI[si],43
+        mov     byte UNIT_WORKING[si],00
+        mov     byte UNIT_TILE[si],52h
+        mov     byte UNIT_HEALTH[si],10
         mov     byte UNIT_GEN_A[si],0
         mov     byte UNIT_GEN_B[si],0
         mov     byte UNIT_GEN_C[si],0
