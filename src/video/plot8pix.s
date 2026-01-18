@@ -537,15 +537,27 @@ plot8pix_go329:
         .no_blue:
         test    bp,2
         jz      .no_green
-        mov     [es:di+4000h],cx
+        mov     [es:di+8000h],cx
         .no_green:
         test    bp,4
         jz      .no_red
-        mov     [es:di+8000h],cx
+        mov     ax,es
+        add     ax,1000h
+        mov     es,ax
+        mov     [es:di],cx
+        mov     ax,es
+        sub     ax,1000h
+        mov     es,ax
         .no_red:
         test    bp,8
         jz      .no_intensity
-        mov     [es:di+0c000h],cx
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
+        mov     [es:di],cx
+        mov     ax,es
+        sub     ax,1800h
+        mov     es,ax
         .no_intensity:
         add     di,2
         ret

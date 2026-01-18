@@ -365,17 +365,26 @@ clear_rect_white_color400:
 ;       bx: height on a logical 160x200 screen, excluding the last text line
 scroll_up_go329:
         push    di,cx,bx
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    scroll_up_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    scroll_up_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    scroll_up_cga
         pop     bx,cx,di
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         tcall   scroll_up_cga
 
 ; description:
@@ -386,17 +395,26 @@ scroll_up_go329:
 ;       bx: height on a logical 160x200 screen
 clear_rect_go329:
         push    di,cx,bx
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    clear_rect_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    clear_rect_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    clear_rect_cga
         pop     bx,cx,di
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         tcall   clear_rect_cga
 
 ; description:
@@ -407,17 +425,26 @@ clear_rect_go329:
 ;       bx: height on a logical 160x200 screen
 clear_rect_white_go329:
         push    di,cx,bx
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    clear_rect_white_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    clear_rect_white_cga
         pop     bx,cx,di
         push    di,cx,bx
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    clear_rect_white_cga
         pop     bx,cx,di
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         tcall   clear_rect_white_cga
 
 ; description:

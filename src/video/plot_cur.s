@@ -306,17 +306,26 @@ plot_cursor_big_color400:
 ;       di: destination offset in video memory (es)
 plot_cursor_go329:
         push    di
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    plot_cursor_cga_2
         pop     di
         push    di
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_cursor_cga_2
         pop     di
         push    di
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_cursor_cga_2
         pop     di
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         tcall   plot_cursor_cga_2
 
 ; description:
@@ -325,17 +334,26 @@ plot_cursor_go329:
 ;       di: destination offset in video memory (es)
 plot_cursor_big_go329:
         push    di
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    plot_cursor_big_cga_2
         pop     di
         push    di
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_cursor_big_cga_2
         pop     di
         push    di
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_cursor_big_cga_2
         pop     di
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         tcall   plot_cursor_big_cga_2
 
 ; description:

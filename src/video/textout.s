@@ -788,17 +788,26 @@ plot_string_color_color400:
 ;       cx: length
 plot_string_go329:
         push    si,di,cx
-        add     di,0c000h
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
         call    plot_string_cga
         pop     cx,di,si
         push    si,di,cx
-        add     di,8000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_string_cga
         pop     cx,di,si
         push    si,di,cx
-        add     di,4000h
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_string_cga
         pop     cx,di,si
+        mov     ax,es
+        sub     ax,800h
+        mov     es,ax
         call    plot_string_cga
         ret
 
@@ -821,7 +830,9 @@ plot_string_color_go329:
         pop     word [font_bg_color]
         pop     cx,di,si
         push    si,di,cx
-        add     di,4000h
+        mov     ax,es
+        add     ax,800h
+        mov     es,ax
         test    word [font_bg_color],2
         push    word [font_bg_color]
         mov     word [font_bg_color],0ffffh
@@ -832,7 +843,9 @@ plot_string_color_go329:
         pop     word [font_bg_color]
         pop     cx,di,si
         push    si,di,cx
-        add     di,8000h
+        mov     ax,es
+        add     ax,800h
+        mov     es,ax
         test    word [font_bg_color],4
         push    word [font_bg_color]
         mov     word [font_bg_color],0ffffh
@@ -842,7 +855,9 @@ plot_string_color_go329:
         call    plot_string_color_cga
         pop     word [font_bg_color]
         pop     cx,di,si
-        add     di,0c000h
+        mov     ax,es
+        add     ax,800h
+        mov     es,ax
         test    word [font_bg_color],8
         push    word [font_bg_color]
         mov     word [font_bg_color],0ffffh
@@ -851,7 +866,9 @@ plot_string_color_go329:
         .intensity:
         call    plot_string_color_cga
         pop     word [font_bg_color]
-        sub     di,0c000h
+        mov     ax,es
+        sub     ax,1800h
+        mov     es,ax
         ret
 
 ; description:
