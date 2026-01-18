@@ -1089,22 +1089,22 @@ mode_vars_go329:
 
 .file_exts              db      "CGAVGAVGAVGA"
 
-.plot_cursor            dw      plot_cursor_cga_2
-.plot_cursor_big        dw      plot_cursor_big_cga_2
+.plot_cursor            dw      plot_cursor_go329
+.plot_cursor_big        dw      plot_cursor_big_go329
 .i_plot_tile            dw      i_plot_tile_go329
-.plot_string            dw      plot_string_cga
-.plot_string_color      dw      plot_string_color_cga
-.plot8pix               dw      plot8pix_cga
-.scroll_up              dw      scroll_up_cga
-.clear_rect             dw      clear_rect_cga
-.clear_rect_white       dw      clear_rect_white_cga
+.plot_string            dw      plot_string_go329
+.plot_string_color      dw      plot_string_color_go329
+.plot8pix               dw      plot8pix_go329
+.scroll_up              dw      scroll_up_go329
+.clear_rect             dw      clear_rect_go329
+.clear_rect_white       dw      clear_rect_white_go329
 .calc_screen_offset     dw      calc_screen_offset_cga
 .mode_specific_entry    dw      dummy_func
 .mode_specific_string   dw      menu_string_transparency_n_a
 .set_video_mode         dw      set_video_mode_go329
 .restore_old_mode       dw      restore_old_mode_generic
 
-.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_color400
+.converting_sys_to_vid_movsb    dw      fadein_pixel_xfer_go329
 .convert_tiles          dw      convert_tiles_pc1512
 .convert_screen         dw      convert_screen_pc1512
 

@@ -504,6 +504,61 @@ plot8pix_color400:
 ;       bp: color
 ; returns:
 ;       di: next destination offset in video memory (es)
+plot8pix_go329:
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        shr     ch,1
+        rcr     ax,1
+        sar     ax,1
+        xchg    al,ah
+        mov     cx,ax
+        test    bp,1
+        jz      .no_blue
+        mov     [es:di],cx
+        .no_blue:
+        test    bp,2
+        jz      .no_green
+        mov     [es:di+4000h],cx
+        .no_green:
+        test    bp,4
+        jz      .no_red
+        mov     [es:di+8000h],cx
+        .no_red:
+        test    bp,8
+        jz      .no_intensity
+        mov     [es:di+0c000h],cx
+        .no_intensity:
+        add     di,2
+        ret
+
+; description:
+;       Plotting routine for a horizontally aligned group of nominally
+;       eight pixels on nominally black background.
+; parameters:
+;       ch: bitmask
+;       di: destination offset in video memory (es)
+;       bp: color
+; returns:
+;       di: next destination offset in video memory (es)
 plot8pix_mtdy:
         shl     ch,1
         sbb     al,al

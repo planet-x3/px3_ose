@@ -304,6 +304,44 @@ plot_cursor_big_color400:
 ;       Plot a graphical unit selection cursor.
 ; parameters:
 ;       di: destination offset in video memory (es)
+plot_cursor_go329:
+        push    di
+        add     di,0c000h
+        call    plot_cursor_cga_2
+        pop     di
+        push    di
+        add     di,8000h
+        call    plot_cursor_cga_2
+        pop     di
+        push    di
+        add     di,4000h
+        call    plot_cursor_cga_2
+        pop     di
+        tcall   plot_cursor_cga_2
+
+; description:
+;       Plot a big graphical building selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
+plot_cursor_big_go329:
+        push    di
+        add     di,0c000h
+        call    plot_cursor_big_cga_2
+        pop     di
+        push    di
+        add     di,8000h
+        call    plot_cursor_big_cga_2
+        pop     di
+        push    di
+        add     di,4000h
+        call    plot_cursor_big_cga_2
+        pop     di
+        tcall   plot_cursor_big_cga_2
+
+; description:
+;       Plot a graphical unit selection cursor.
+; parameters:
+;       di: destination offset in video memory (es)
 plot_cursor_text:
         mov     ax,0f0b1h
         stosw

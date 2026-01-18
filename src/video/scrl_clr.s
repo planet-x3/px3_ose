@@ -358,6 +358,69 @@ clear_rect_white_color400:
         tcall   clear_rect_white_cga
 
 ; description:
+;       Scrolls the contents of a rectangle up by one text line (= six logical pixels).
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen, excluding the last text line
+scroll_up_go329:
+        push    di,cx,bx
+        add     di,0c000h
+        call    scroll_up_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,8000h
+        call    scroll_up_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,4000h
+        call    scroll_up_cga
+        pop     bx,cx,di
+        tcall   scroll_up_cga
+
+; description:
+;       Clears a rectangle on screen (nominally black) on Olivetti M24 GO329.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_go329:
+        push    di,cx,bx
+        add     di,0c000h
+        call    clear_rect_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,8000h
+        call    clear_rect_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,4000h
+        call    clear_rect_cga
+        pop     bx,cx,di
+        tcall   clear_rect_cga
+
+; description:
+;       Clears a rectangle on screen (nominally white) on Olivetti M24 GO329.
+; parameters:
+;       di: destination offset in video memory (es)
+;       cx: width on a logical 160x200 screen
+;       bx: height on a logical 160x200 screen
+clear_rect_white_go329:
+        push    di,cx,bx
+        add     di,0c000h
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,8000h
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        push    di,cx,bx
+        add     di,4000h
+        call    clear_rect_white_cga
+        pop     bx,cx,di
+        tcall   clear_rect_white_cga
+
+; description:
 ;       Calculate offset in video memory from coordinates on a logical 160x200 screen.
 ; parameters:
 ;       di: logical coordinates (Y in upper byte, X in lower byte)

@@ -781,6 +781,80 @@ plot_string_color_color400:
         ret
 
 ; description:
+;       String plotting routine for Olivetti M24 GO329.
+; parameters:
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_go329:
+        push    si,di,cx
+        add     di,0c000h
+        call    plot_string_cga
+        pop     cx,di,si
+        push    si,di,cx
+        add     di,8000h
+        call    plot_string_cga
+        pop     cx,di,si
+        push    si,di,cx
+        add     di,4000h
+        call    plot_string_cga
+        pop     cx,di,si
+        call    plot_string_cga
+        ret
+
+; description:
+;       String plotting routine for Olivetti M24 GO329 (color).
+; parameters:
+;       font_bg_color: background color in mode-specific format
+;       si: string
+;       di: screen pos
+;       cx: length
+plot_string_color_go329:
+        push    si,di,cx
+        test    word [font_bg_color],1
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .blue
+        inc     word [font_bg_color]
+        .blue:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        push    si,di,cx
+        add     di,4000h
+        test    word [font_bg_color],2
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .green
+        inc     word [font_bg_color]
+        .green:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        push    si,di,cx
+        add     di,8000h
+        test    word [font_bg_color],4
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .red
+        inc     word [font_bg_color]
+        .red:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        pop     cx,di,si
+        add     di,0c000h
+        test    word [font_bg_color],8
+        push    word [font_bg_color]
+        mov     word [font_bg_color],0ffffh
+        jnz     .intensity
+        inc     word [font_bg_color]
+        .intensity:
+        call    plot_string_color_cga
+        pop     word [font_bg_color]
+        sub     di,0c000h
+        ret
+
+; description:
 ;       String plotting routine for VGA mode-Y.
 ; parameters:
 ;       font_bg_color: foreground/background color in mode-specific format
