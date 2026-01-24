@@ -820,6 +820,9 @@ plot_string_go329:
 ;       cx: length
 plot_string_color_go329:
         push    si,di,cx
+        mov     ax,es
+        add     ax,800h
+        mov     es,ax
         test    word [font_bg_color],1
         push    word [font_bg_color]
         mov     word [font_bg_color],0ffffh
@@ -831,7 +834,7 @@ plot_string_color_go329:
         pop     cx,di,si
         push    si,di,cx
         mov     ax,es
-        add     ax,800h
+        add     ax,1000h
         mov     es,ax
         test    word [font_bg_color],2
         push    word [font_bg_color]
@@ -844,7 +847,7 @@ plot_string_color_go329:
         pop     cx,di,si
         push    si,di,cx
         mov     ax,es
-        add     ax,800h
+        sub     ax,800h
         mov     es,ax
         test    word [font_bg_color],4
         push    word [font_bg_color]
@@ -856,7 +859,7 @@ plot_string_color_go329:
         pop     word [font_bg_color]
         pop     cx,di,si
         mov     ax,es
-        add     ax,800h
+        sub     ax,1000h
         mov     es,ax
         test    word [font_bg_color],8
         push    word [font_bg_color]
@@ -866,9 +869,6 @@ plot_string_color_go329:
         .intensity:
         call    plot_string_color_cga
         pop     word [font_bg_color]
-        mov     ax,es
-        sub     ax,1800h
-        mov     es,ax
         ret
 
 ; description:

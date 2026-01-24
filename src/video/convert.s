@@ -573,20 +573,22 @@ fadein_pixel_xfer_go329:
         add     ax,dx
         mov     si,ax
 
+        shl     si,2
+        lodsb
+        mov     [es:di],al              ; seg a000h
         mov     ax,es
         add     ax,1000h
         mov     es,ax
-        shl     si,2
         lodsb
-        mov     [es:di+8000h],al
+        mov     [es:di],al              ; seg b000h
         lodsb
-        mov     [es:di],al
+        mov     [es:di+8000h],al        ; seg b800h
         mov     ax,es
         sub     ax,1000h
         mov     es,ax
         lodsb
-        mov     [es:di+8000h],al
-        movsb
+        mov     [es:di+8000h],al        ; seg a800h
+        inc     di
         pop     si,dx,ax
         ret
 
