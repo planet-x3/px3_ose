@@ -443,24 +443,27 @@ i_plot_tile_color400:
 ; returns:
 ;       di: next destination offset in video memory
 i_plot_tile_go329:
-        call    i_plot_tile_cga
-        sub     di,4
-        mov     ax,es
-        add     ax,1000h
-        mov     es,ax
-        call    i_plot_tile_cga
-        sub     di,4
         mov     ax,es
         add     ax,800h
         mov     es,ax
         call    i_plot_tile_cga
         sub     di,4
         mov     ax,es
-        sub     ax,1000h
+        sub     ax,800h
+        mov     es,ax
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     ax,es
+        add     ax,1800h
+        mov     es,ax
+        call    i_plot_tile_cga
+        sub     di,4
+        mov     ax,es
+        sub     ax,800h
         mov     es,ax
         call    i_plot_tile_cga
         mov     ax,es
-        sub     ax,800h
+        sub     ax,1000h
         mov     es,ax
         ret
 

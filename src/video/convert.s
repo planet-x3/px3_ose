@@ -575,20 +575,18 @@ fadein_pixel_xfer_go329:
 
         shl     si,2
         lodsb
-        mov     [es:di],al              ; seg a000h
+        mov     [es:di+8000h],al
+        lodsb
+        mov     [es:di],al
         mov     ax,es
         add     ax,1000h
         mov     es,ax
         lodsb
-        mov     [es:di],al              ; seg b000h
-        lodsb
-        mov     [es:di+8000h],al        ; seg b800h
+        mov     [es:di+8000h],al
+        movsb
         mov     ax,es
         sub     ax,1000h
         mov     es,ax
-        lodsb
-        mov     [es:di+8000h],al        ; seg a800h
-        inc     di
         pop     si,dx,ax
         ret
 
